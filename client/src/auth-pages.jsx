@@ -345,7 +345,7 @@ export function InfoPage({ type }) {
       items: [
         [
           "How do I place an order?",
-          "Choose products from one shop, add them to your bag, and complete checkout with your delivery details. Orders use cash on delivery. This course prototype does not dispatch a real courier.",
+          "Add products from different shops to your bag. Use each shop’s checkout button to place a separate order with your delivery details. Delivery costs BDT 60 per shop order. Orders use cash on delivery. This course prototype does not dispatch a real courier.",
         ],
         [
           "Can I cancel an order?",

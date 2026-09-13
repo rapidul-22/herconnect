@@ -4,6 +4,10 @@ A responsive women-focused marketplace built with React, Express and MongoDB. Th
 
 **Start here:** follow the setup below. No existing Atlas collection needs to be deleted. The package contains no database passwords.
 
+## Latest update: logout and multi-shop bag
+
+The top bar now has a labelled Log out button on desktop and mobile. The bag retains products from different shops, groups them by shop and checks out each shop separately. Successful checkout removes only purchased quantities; a failed checkout leaves the bag intact. See docs/LOGOUT-BAG-FIX.md for installation, validation and Git steps.
+
 ## Current progress
 
 | Area | Status |
@@ -101,7 +105,7 @@ You can also create a fresh account through signup. A new account has no fake or
 
 1. Browse Marketplace without signing in; search for “mug” and open a detail page.
 2. Sign up. Check the four-module dashboard. Open each future card to see its honest availability notice.
-3. Save a product, add it to the bag and place a COD order. Products in one checkout must belong to one shop.
+3. Save a product, add it to the bag and place a COD order. Your bag can hold products from several shops. Use the checkout button for the shop you want to order from; the other items remain in your bag.
 4. Sign out and sign in as that product's seller. Open My shop → Manage sales → order. Confirm, ship and deliver it.
 5. Sign back in as buyer. Open the delivered order and submit a review.
 6. With your new account, apply for a shop and create a product using an uploaded photo.
@@ -175,7 +179,7 @@ The authoring environment blocked the MongoDB process with `open: Operation not 
 ## Deliberate simplifications
 
 - Secure server-backed cookie sessions replace the proposal's JWT tokens. This makes logout/revocation straightforward for one web app. No auth tokens live in localStorage.
-- One seller per order avoids complex split deliveries and payments.
+- The bag supports multiple shops. Checkout is separate for each shop, with BDT 60 delivery per shop order.
 - Cart is device-local per account; wishlist and orders are in MongoDB.
 - Reviews aggregate from actual stored review records instead of maintaining a fragile separate average counter.
 - Shop approval is manual application review, not identity/background verification.

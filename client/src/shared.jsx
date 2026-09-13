@@ -256,11 +256,6 @@ export function CartProvider({ children, user, notify, base }) {
     if (user.isAdmin) return notify("Moderator accounts cannot shop.", "error");
     if (user._id === p.seller._id)
       return notify("You cannot buy your own products.", "error");
-    if (cart.length && cart[0].seller._id !== p.seller._id)
-      return notify(
-        "Your bag contains another shop. Complete or clear that bag before switching shops.",
-        "error",
-      );
     const current = cart.find((i) => i._id === p._id);
     if ((current?.quantity || 0) + quantity > Math.min(p.stock, 50))
       return notify("That quantity is not available.", "error");
