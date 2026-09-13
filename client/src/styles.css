@@ -362,10 +362,6 @@ textarea {
   flex-shrink: 0;
   font-weight: 600;
 }
-.logout {
-  padding: 5px;
-  color: #9b8992;
-}
 .workspace {
   margin-left: 240px;
 }
@@ -2862,4 +2858,23 @@ dialog p {
   .btn:hover {
     transform: none !important;
   }
+}
+
+/* Account access and a bag that keeps each shop's order separate. */
+.sidebar { overflow-y: auto; }
+.sidebar > * { flex-shrink: 0; }
+.logout-button { color: var(--berry); white-space: nowrap; min-height: 44px; }
+.cart-shop { margin-top: 24px; padding: 20px; border: 1px solid var(--border); border-radius: 14px; background: white; }
+.cart-shop h2 { font-size: 1.4rem; }
+.shop-checkout { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding-top: 20px; }
+.shop-checkout small { display: block; color: var(--muted); margin-top: 6px; }
+.shop-checkout .btn { white-space: normal; text-align: center; }
+@media (max-width: 760px) {
+  .top-actions .location-tag { display: none; }
+  .top-actions { gap: 8px; }
+  .logout-button { padding: 10px; }
+  .cart-shop { padding: 14px; }
+  .cart-shop .cart-item { flex-wrap: wrap; gap: 12px; }
+  .cart-shop .cart-item > div:not(.cart-item-end) { min-width: 120px; }
+  .cart-shop .cart-item-end { flex-direction: row; width: 100%; }
 }

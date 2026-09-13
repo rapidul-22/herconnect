@@ -158,14 +158,7 @@ function Layout() {
                   </small>
                 </span>
               </NavLink>
-              <button
-                className="logout"
-                onClick={() => logout.mutate()}
-                disabled={logout.isPending}
-                aria-label="Log out"
-              >
-                <LogOut size={18} />
-              </button>
+
             </>
           ) : (
             <Link className="btn primary" to="/login">
@@ -209,6 +202,17 @@ function Layout() {
                 <span>My bag</span>
                 <b>{cart.reduce((s, i) => s + i.quantity, 0)}</b>
               </Link>
+            )}
+            {user && (
+              <button
+                type="button"
+                className="btn small logout-button"
+                onClick={() => logout.mutate()}
+                disabled={logout.isPending}
+              >
+                <LogOut size={18} />
+                {logout.isPending ? "Logging out…" : "Log out"}
+              </button>
             )}
             {!user && (
               <Link to="/signup" className="btn small primary">

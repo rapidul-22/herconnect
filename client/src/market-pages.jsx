@@ -1,3 +1,4 @@
+import { groupCart, removeOrderedItems } from "./cart.js";
 import { useState } from "react";
 import {
   Link,
@@ -487,6 +488,7 @@ export function Shop() {
 }
 export function Cart() {
   const { cart, setCart } = useApp();
+  const groups = groupCart(cart);
   const update = (id, quantity) =>
     setCart((old) => old.map((i) => (i._id === id ? { ...i, quantity } : i)));
   const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -502,12 +504,15 @@ export function Cart() {
           <div>
             <div className="shop-cart-label">
               <StoreIcon />
-              From {cart[0].seller.shop.name}
+              {groups.length} {groups.length === 1 ? "shop" : "shops"} in your bag
               <button className="link-button" onClick={() => setCart([])}>
                 Clear bag
               </button>
             </div>
-            {cart.map((i) => (
+            {groups.map(({ seller, items }) => (
+              <section className="cart-shop" key={seller._id} aria-label={seller.shop.name}>
+                <h2>{seller.shop.name}</h2>
+                {items.map((i) => (
               <article className="cart-item" key={i._id}>
                 <Link to={"/marketplace/" + i._id}>
                   <img src={i.image} alt={i.name} />
@@ -548,6 +553,17 @@ export function Cart() {
                   </button>
                 </div>
               </article>
+                ))}
+                <div className="shop-checkout">
+                  <p>
+                    Shop total: <strong>{money(items.reduce((sum, i) => sum + i.price * i.quantity, 0) + 6000)}</strong>
+                    <small>Includes {money(6000)} delivery</small>
+                  </p>
+                  <Link className="btn primary" to={"/checkout?shop=" + seller._id}>
+                    Checkout {seller.shop.name}<ArrowRight size={18} />
+                  </Link>
+                </div>
+              </section>
             ))}
             <Link className="back-link" to="/marketplace">
               <ArrowLeft size={16} />
@@ -561,20 +577,15 @@ export function Cart() {
               <strong>{money(subtotal)}</strong>
             </div>
             <div>
-              <span>Delivery</span>
-              <strong>{money(6000)}</strong>
+              <span>Delivery ({groups.length} {groups.length === 1 ? "shop" : "shops"})</span>
+              <strong>{money(6000 * groups.length)}</strong>
             </div>
             <div className="summary-total">
-              <span>Total</span>
-              <strong>{money(subtotal + 6000)}</strong>
+              <span>Total estimate</span>
+              <strong>{money(subtotal + 6000 * groups.length)}</strong>
             </div>
-            <Link className="btn primary" to="/checkout">
-              Continue to checkout
-              <ArrowRight size={18} />
-            </Link>
             <p className="small-copy">
-              Final prices and stock are checked at checkout. Cash on delivery.
-              One shop per order.
+              Choose a shop’s checkout button to place its order. Each shop has a separate order and delivery fee. Other items stay in your bag. Prices and stock are checked at checkout.
             </p>
           </div>
         </div>
@@ -591,8 +602,15 @@ function StoreIcon() {
   return <ShoppingBag size={19} />;
 }
 export function Checkout() {
-  const { user, cart, setCart } = useApp(),
+  const { cart } = useApp();
+  const [params] = useSearchParams();
+  const shopId = params.get("shop") || cart[0]?.seller._id || "";
+  return <ShopCheckout key={shopId} shopId={shopId} />;
+}
+function ShopCheckout({ shopId }) {
+  const { user, cart: entireCart, setCart } = useApp(),
     navigate = useNavigate();
+  const cart = entireCart.filter((item) => item.seller._id === shopId);
   const [requestKey] = useState(() => crypto.randomUUID());
   const action = useAction(
     (shipping) =>
@@ -605,7 +623,7 @@ export function Checkout() {
         },
       }),
     (order) => {
-      setCart([]);
+      setCart((old) => removeOrderedItems(old, order.items));
       navigate("/orders/" + order._id + "?placed=1");
     },
     "Your order is placed.",
@@ -616,7 +634,7 @@ export function Checkout() {
       <PageTitle
         eyebrow="ALMOST YOURS"
         title="The finishing touches."
-        description="Tell us where your order should go."
+        description={cart.length ? `Order from ${cart[0].seller.shop.name}. Other shops’ items stay in your bag.` : "Choose a shop from your bag to continue."}
       />
       {cart.length ? (
         <form
@@ -689,7 +707,8 @@ export function Checkout() {
             )}
           </div>
           <div className="panel summary-card">
-            <h2>Your order</h2>
+            <h2>{cart[0].seller.shop.name}</h2>
+            <Link className="back-link" to="/cart">Back to all bag items</Link>
             {cart.map((i) => (
               <div className="mini-order-item" key={i._id}>
                 <img src={i.image} alt="" />
@@ -724,8 +743,10 @@ export function Checkout() {
         </form>
       ) : (
         <Empty
-          title="Your bag is empty"
-          description="Add a find before checking out."
+          title="No items for this shop"
+          description="Return to your bag to choose another shop or add more products."
+          to="/cart"
+          action="Back to my bag"
         />
       )}
     </>

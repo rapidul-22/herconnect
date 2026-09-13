@@ -26,7 +26,7 @@ HerConnect+ brings women-focused economic and safety services together for users
 | NAV-01 | Dashboard | Four services visible; Marketplace active; other three explicitly not built; live own order/wishlist counts |
 | CAT-01 | Discover products | Search, categories, sorting, pagination and maximum-price filter are server-backed; only active approved shops visible |
 | CAT-02 | Product detail | Photo, description, material/care details, price in BDT, stock, seller, delivery information, ratings and labelled sample reviews |
-| CART-01 | Cart | Add/remove/update quantities; one seller; survives refresh for that account on that device; server revalidates everything at checkout |
+| CART-01 | Cart | Add/remove/update quantities across multiple sellers; group by shop with separate checkout and BDT 60 delivery per shop order; preserve unpurchased items; survives refresh for that account on that device; server revalidates everything at checkout |
 | SAVE-01 | Wishlist | Save/unsave to MongoDB for the signed-in account; visible after another login |
 | ORDER-01 | Checkout | Address and phone validated; server calculates totals; database transaction creates order and decrements stock together |
 | ORDER-02 | Duplicate protection | Repeating a checkout with the same request key returns the existing order rather than buying twice |
