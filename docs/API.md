@@ -1,5 +1,7 @@
 # Release 1 API contract
 
+> Release 2 adds /api/hiring endpoints documented in HIRING.md. Existing marketplace/auth routes are unchanged.
+
 All paths start /api. JSON requests except multipart image upload. Money is integer paisa in API responses; UI displays BDT. Errors return {error, fields?}. Validation 400, no session 401, forbidden 403, missing resource 404, conflict 409, throttled 429. Authenticated mutations send X-CSRF-Token. The browser includes session cookies automatically on same-origin requests.
 
 | Method | Path | Access and purpose |

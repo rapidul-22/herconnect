@@ -1,5 +1,7 @@
 # Architecture and data dictionary
 
+> Release 2 adds separate hiring models/routes in server/hiring-models.js and server/hiring.js, scheduling rules in server/hiring-rules.js, and client/src/hiring-pages.jsx. See HIRING.md for data relationships, privacy and transactional acceptance.
+
 ## Structure
 A single npm project runs Vite for React development and Express for the API. Vite proxies /api, /uploads and /media to Express; a production build is served by Express on one origin. MongoDB Atlas is a replica set and supports the transactions used for stock and orders. Tests use a separate local MongoDB replica set, never the user's Atlas data.
 

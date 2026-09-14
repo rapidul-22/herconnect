@@ -52,6 +52,7 @@ import {
   Shop,
 } from "./market-pages.jsx";
 import { Seller, ProductEditor, Admin } from "./seller-pages.jsx";
+import { HiringDirectory, WorkerDetail, WorkerMine, HiringBookings, HiringBookingDetail, HiringComplaints, HiringAdmin } from "./hiring-pages.jsx";
 export function Logo() {
   return (
     <Link to="/" className="logo">
@@ -104,13 +105,14 @@ function Layout() {
   const links = [
     ["/dashboard", LayoutDashboard, "My dashboard"],
     ["/marketplace", ShoppingBag, "Marketplace"],
+    ["/hiring", HandHeart, "Worker hiring"],
     ...(!user?.isAdmin
       ? [
           ["/wishlist", Heart, "Saved favourites"],
           ["/orders", Package, "My orders"],
           ["/seller", Store, "My shop"],
         ]
-      : [["/admin", ShieldCheck, "Moderation"]]),
+      : [["/admin", ShieldCheck, "Shop moderation"], ["/admin/hiring", HandHeart, "Worker moderation"]]),
   ];
   return (
     <div className="app-layout">
@@ -256,6 +258,7 @@ function Dashboard() {
       icon: ShoppingBag,
       tone: "rose",
       live: true,
+      path: "/marketplace",
     },
     {
       name: "Safe transport",
@@ -271,7 +274,9 @@ function Dashboard() {
     },
     {
       name: "Worker hiring",
-      desc: "Connect with trusted help for your home.",
+      desc: "Explore service providers and request help for your home.",
+      live: true,
+      path: "/hiring",
       icon: HandHeart,
       tone: "peach",
     },
@@ -318,7 +323,7 @@ function Dashboard() {
         {modules.map((m, i) => (
           <Link
             key={m.name}
-            to={m.live ? "/marketplace" : "/coming-soon/" + i}
+            to={m.live ? m.path : "/coming-soon/" + i}
             className={"module " + m.tone}
           >
             <div className="module-top">
@@ -398,7 +403,7 @@ function ComingSoon() {
         is on its way.
       </h1>
       <p>
-        Transport, safety reporting and worker hiring are planned for future
+        Transport and safety reporting are planned for future
         releases. These services are not available yet.
       </p>
       <Link className="btn primary" to="/dashboard">
@@ -466,6 +471,8 @@ export default function App() {
             }
           />
           <Route path="marketplace" element={<Marketplace />} />
+          <Route path="hiring" element={<HiringDirectory />} />
+          <Route path="hiring/workers/:id" element={<WorkerDetail />} />
           <Route path="marketplace/:id" element={<ProductDetail />} />
           <Route path="shops/:id" element={<Shop />} />
           <Route path="help" element={<InfoPage type="help" />} />
@@ -475,6 +482,10 @@ export default function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="coming-soon/:module" element={<ComingSoon />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="hiring/mine" element={<WorkerMine />} />
+            <Route path="hiring/bookings" element={<HiringBookings />} />
+            <Route path="hiring/bookings/:id" element={<HiringBookingDetail />} />
+            <Route path="hiring/complaints" element={<HiringComplaints />} />
             <Route path="cart" element={<Cart />} />
             <Route path="checkout" element={<Checkout />} />
             <Route path="orders" element={<Orders />} />
@@ -489,6 +500,7 @@ export default function App() {
           </Route>
           <Route element={<Guard admin />}>
             <Route path="admin" element={<Admin />} />
+            <Route path="admin/hiring" element={<HiringAdmin />} />
           </Route>
           <Route
             path="*"

@@ -1,10 +1,18 @@
-# HerConnect+ — Release 1
+# HerConnect+ — Release 2: Marketplace + Worker Hiring
 
-A responsive women-focused marketplace built with React, Express and MongoDB. This delivery completes the shared account pages, dashboard and marketplace source. The other three approved modules are visible as “Coming next”; their service functionality is not implemented.
+A responsive women-focused platform built with React, Express and MongoDB. Accounts, dashboard, Marketplace and Domestic Worker Hiring are implemented. Safe Transport and Safety Reporting remain future modules.
 
 **Start here:** follow the setup below. No existing Atlas collection needs to be deleted. The package contains no database passwords.
 
-## Latest update: logout and multi-shop bag
+## Release 2: Domestic Worker Hiring
+
+Worker applications and independent approval, directory/search, availability, booking requests, transaction-protected acceptance, cancellation, customer completion, reviews and privately moderated complaints are implemented. Start with **docs/HIRING-SETUP.md** for the incremental installation, demo accounts, manual checks and Git steps. Rules and API details are in **docs/HIRING.md**.
+
+No new dependencies or .env variables are required. Keep any dependency security upgrades already made locally. The new demo command is `node --env-file=.env server/seed-hiring.js`; it is additive and separate from the marketplace seed.
+
+Hiring build and seven database-independent tests passed; browser workflows passed using simulated API responses. The live-database integration suite is included but its MongoDB process exited with code 100 before execution in the authoring environment. Your Atlas cluster was not accessed.
+
+## Previous update: logout and multi-shop bag
 
 The top bar now has a labelled Log out button on desktop and mobile. The bag retains products from different shops, groups them by shop and checks out each shop separately. Successful checkout removes only purchased quantities; a failed checkout leaves the bag intact. See docs/LOGOUT-BAG-FIX.md for installation, validation and Git steps.
 
@@ -15,7 +23,7 @@ The top bar now has a labelled Log out button on desktop and mobile. The bag ret
 | Revised requirements, architecture, API contract, test plan | Written in docs/ |
 | Signup, login, logout, protected pages, profile, password change | Implemented |
 | Password reset | Implemented; SMTP needed for real emails; local development prints reset links in the API terminal |
-| Main dashboard with all four modules | Implemented; only Marketplace is active |
+| Main dashboard with all four modules | Marketplace and Worker Hiring active; two future modules |
 | Marketplace search, categories, price filter, sorting, pagination | Implemented |
 | Product detail, shop page, wishlist and persistent device cart | Implemented |
 | COD checkout, purchase snapshots, order history, cancellation | Implemented with MongoDB transactions and retry protection |
@@ -23,7 +31,8 @@ The top bar now has a labelled Log out button on desktop and mobile. The bag ret
 | Admin seller approval, suspension, listing archive and decision history | Implemented |
 | Reviews | New reviews require a delivered purchase; 30 sample reviews are labelled demo |
 | Sample content | 4 fictional shops, 10 products, 3 buyers, 30 reviews and bundled photographs |
-| Transport / reporting / hiring | Future releases; no fake active features |
+| Worker Hiring | Profiles, schedules, bookings, reviews and complaint moderation implemented; see docs/HIRING.md |
+| Transport / reporting | Future releases |
 | Build | Successful in the authoring environment |
 | API guard tests | 4 tests passed |
 | Browser checks | Passed at desktop/mobile sizes using fixture API responses; see docs/TESTING.md |
@@ -104,7 +113,7 @@ You can also create a fresh account through signup. A new account has no fake or
 ## Recommended first walkthrough
 
 1. Browse Marketplace without signing in; search for “mug” and open a detail page.
-2. Sign up. Check the four-module dashboard. Open each future card to see its honest availability notice.
+2. Sign up. Check the four-module dashboard. Marketplace and Worker Hiring open their modules; Transport and Reporting show availability notices.
 3. Save a product, add it to the bag and place a COD order. Your bag can hold products from several shops. Use the checkout button for the shop you want to order from; the other items remain in your bag.
 4. Sign out and sign in as that product's seller. Open My shop → Manage sales → order. Confirm, ship and deliver it.
 5. Sign back in as buyer. Open the delivered order and submit a review.
@@ -189,4 +198,4 @@ The authoring environment blocked the MongoDB process with `open: Operation not 
 
 ## Next checkpoint
 
-**Stopped after Marketplace, as requested.** First run and review this release. Future work should start only after you provide feedback: fix Release 1 issues, then choose Safety Reporting, Worker Hiring or Safe Transport. Do not mark future modules complete merely because their dashboard cards exist.
+**Stopped after Worker Hiring.** Review Release 2 with the walkthrough in docs/HIRING-SETUP.md. Marketplace issues were deferred at the user’s request; this update does not claim to resolve them. Safety Reporting and Safe Transport remain future work.
