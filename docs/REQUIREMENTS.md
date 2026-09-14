@@ -1,5 +1,7 @@
 # HerConnect+ requirements and release scope
 
+> Release 1 baseline below is historical. Release 2 implements Worker Hiring; its current requirements and differences are in HIRING.md. Marketplace rules remain as implemented.
+
 Status: approved implementation baseline for Release 1, 12 September 2026. This document replaces contradictory rules in the Complete Feature Plan. Implementation status and verification evidence belong in README.md and TESTING.md, not in requirement claims.
 
 ## Purpose and audience

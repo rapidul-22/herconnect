@@ -9,6 +9,7 @@ import { existsSync, mkdirSync } from "node:fs";
 import mongoose from "mongoose";
 import { auth, loadSession, fail } from "./auth.js";
 import { marketplace } from "./marketplace.js";
+import { hiring } from "./hiring.js";
 export const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 export const uploads = path.join(root, "server/uploads");
 mkdirSync(uploads, { recursive: true });
@@ -66,6 +67,7 @@ app.get("/api/health", (req, res) =>
 app.use("/api", loadSession);
 app.use("/api/auth", auth);
 app.use("/api", marketplace);
+app.use("/api/hiring", hiring);
 app.use("/api", (req, res) =>
   res.status(404).json({ error: "API route not found." }),
 );
