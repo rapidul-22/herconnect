@@ -54,6 +54,7 @@ import {
 import { Seller, ProductEditor, Admin } from "./seller-pages.jsx";
 import { HiringDirectory, WorkerDetail, WorkerMine, HiringBookings, HiringBookingDetail, HiringComplaints, HiringAdmin } from "./hiring-pages.jsx";
 import { SafetyFeed, SafetyNew, SafetyMine, SafetyDetail, SafetyZones, SafetyResources, SafetyAdmin } from "./safety-pages.jsx";
+import { TransportHome, TransportDriverDetail, TransportDrive, TransportContact, TransportRides, TransportRideDetail, TransportAdmin } from "./transport-pages.jsx";
 export function Logo() {
   return (
     <Link to="/" className="logo">
@@ -108,13 +109,14 @@ function Layout() {
     ["/marketplace", ShoppingBag, "Marketplace"],
     ["/hiring", HandHeart, "Worker hiring"],
     ["/safety", ShieldCheck, "Safety & support"],
+    ["/transport", CarFront, "Safe transport"],
     ...(!user?.isAdmin
       ? [
           ["/wishlist", Heart, "Saved favourites"],
           ["/orders", Package, "My orders"],
           ["/seller", Store, "My shop"],
         ]
-      : [["/admin", ShieldCheck, "Shop moderation"], ["/admin/hiring", HandHeart, "Worker moderation"], ["/admin/safety", ShieldCheck, "Safety moderation"]]),
+      : [["/admin", ShieldCheck, "Shop moderation"], ["/admin/hiring", HandHeart, "Worker moderation"], ["/admin/safety", ShieldCheck, "Safety moderation"], ["/admin/transport", CarFront, "Transport moderation"]]),
   ];
   return (
     <div className="app-layout">
@@ -264,6 +266,8 @@ function Dashboard() {
     },
     {
       name: "Safe transport",
+      live: true,
+      path: "/transport",
       desc: "A more confident way to get where you need to go.",
       icon: CarFront,
       tone: "lavender",
@@ -396,26 +400,6 @@ function Dashboard() {
     </>
   );
 }
-function ComingSoon() {
-  return (
-    <div className="coming">
-      <Flower2 size={50} />
-      <span className="eyebrow">GROWING, ONE STEP AT A TIME</span>
-      <h1>
-        Something thoughtful
-        <br />
-        is on its way.
-      </h1>
-      <p>
-        Safe Transport is planned for a future release. This service is not available yet.
-      </p>
-      <Link className="btn primary" to="/dashboard">
-        Back to your dashboard
-        <ArrowRight size={18} />
-      </Link>
-    </div>
-  );
-}
 export default function App() {
   const session = useQuery({
     queryKey: ["session"],
@@ -474,6 +458,8 @@ export default function App() {
             }
           />
           <Route path="marketplace" element={<Marketplace />} />
+          <Route path="transport" element={<TransportHome />} />
+          <Route path="transport/drivers/:id" element={<TransportDriverDetail />} />
           <Route path="safety" element={<SafetyFeed />} />
           <Route path="safety/zones" element={<SafetyZones />} />
           <Route path="safety/resources" element={<SafetyResources />} />
@@ -488,8 +474,12 @@ export default function App() {
           <Route element={<Guard />}>
             <Route path="safety/new" element={<SafetyNew />} />
             <Route path="safety/mine" element={<SafetyMine />} />
+            <Route path="transport/drive" element={<TransportDrive />} />
+            <Route path="transport/contact" element={<TransportContact />} />
+            <Route path="transport/rides" element={<TransportRides />} />
+            <Route path="transport/rides/:id" element={<TransportRideDetail />} />
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="coming-soon/:module" element={<ComingSoon />} />
+            <Route path="coming-soon/:module" element={<Navigate to="/dashboard" replace />} />
             <Route path="profile" element={<Profile />} />
             <Route path="hiring/mine" element={<WorkerMine />} />
             <Route path="hiring/bookings" element={<HiringBookings />} />
@@ -509,6 +499,7 @@ export default function App() {
           </Route>
           <Route element={<Guard admin />}>
             <Route path="admin" element={<Admin />} />
+            <Route path="admin/transport" element={<TransportAdmin />} />
             <Route path="admin/safety" element={<SafetyAdmin />} />
             <Route path="admin/hiring" element={<HiringAdmin />} />
           </Route>

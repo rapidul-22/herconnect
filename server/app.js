@@ -11,6 +11,7 @@ import { auth, loadSession, fail } from "./auth.js";
 import { marketplace } from "./marketplace.js";
 import { hiring } from "./hiring.js";
 import { safety } from "./safety.js";
+import { transport } from "./transport.js";
 export const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 export const uploads = path.join(root, "server/uploads");
 mkdirSync(uploads, { recursive: true });
@@ -71,6 +72,7 @@ app.use("/api/auth", auth);
 app.use("/api", marketplace);
 app.use("/api/hiring", hiring);
 app.use("/api", safety);
+app.use("/api/transport", transport);
 app.use("/api", (req, res) =>
   res.status(404).json({ error: "API route not found." }),
 );
