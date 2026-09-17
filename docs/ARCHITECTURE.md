@@ -29,3 +29,8 @@ User-uploaded images reside in server/uploads. Back up this directory alongside 
 
 ## Design direction
 Rose/berry primary #A63A50, dark plum text #35252E, blush #F9E9ED, ivory #FFFDFB, teal trust accent #3E6B72. Serif editorial headlines paired with a readable sans body. Product photography, restrained borders, generous spacing, curved cards, compact navigation and responsive grids. Functional hover/focus states and modest transitions respect prefers-reduced-motion. Labels use text as well as colour.
+
+
+## Release 3 architecture
+
+SafetyReport and HelpResource collections, shared Haversine/DBSCAN helpers, a reporting router and React pages reuse the existing session/CSRF/query patterns. Leaflet is bundled locally; OSM supplies map tiles. See SAFETY.md for privacy boundaries and computation limits.

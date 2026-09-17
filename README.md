@@ -1,8 +1,18 @@
-# HerConnect+ — Release 2: Marketplace + Worker Hiring
+# HerConnect+ — Release 3: Marketplace + Hiring + Safety Reporting
 
-A responsive women-focused platform built with React, Express and MongoDB. Accounts, dashboard, Marketplace and Domestic Worker Hiring are implemented. Safe Transport and Safety Reporting remain future modules.
+A responsive women-focused platform built with React, Express and MongoDB. Accounts, dashboard, Marketplace, Domestic Worker Hiring and Safety Reporting are implemented. Safe Transport remains a future module.
 
 **Start here:** follow the setup below. No existing Atlas collection needs to be deleted. The package contains no database passwords.
+
+## Release 3: Safety Reporting
+
+Start with **docs/SAFETY-SETUP.md**. This incremental update adds public/named/anonymous reporting, map location selection, private report tracking, live hotspot clustering, a support directory and admin moderation/resource management. Demo reports and facilities are explicitly fictional and separate from real results.
+
+**Branch rule: start feature/safety-reporting from feature/worker-hiring. Do not merge into main until the full project is complete and the owner explicitly requests it. This overrides merge instructions in older release guides.**
+
+No new npm dependencies, environment settings or API keys. Leaflet 1.9.4 is bundled with its licence; map tiles require internet. Optional seed: `node --env-file=.env server/seed-safety.js`.
+
+Verification: production build and 11 database-independent checks pass. Browser flows pass against simulated APIs. The full Safety MongoDB integration test is included but blocked in the authoring environment before execution by MongoDB exit code 100 (`open: Operation not permitted`). Run it locally; do not mark it passed until your result confirms it. Your prior Hiring integration test passed locally after correcting `dates.endAt`.
 
 ## Release 2: Domestic Worker Hiring
 
@@ -23,7 +33,7 @@ The top bar now has a labelled Log out button on desktop and mobile. The bag ret
 | Revised requirements, architecture, API contract, test plan | Written in docs/ |
 | Signup, login, logout, protected pages, profile, password change | Implemented |
 | Password reset | Implemented; SMTP needed for real emails; local development prints reset links in the API terminal |
-| Main dashboard with all four modules | Marketplace and Worker Hiring active; two future modules |
+| Main dashboard with all four modules | Marketplace, Worker Hiring and Safety active; Transport future |
 | Marketplace search, categories, price filter, sorting, pagination | Implemented |
 | Product detail, shop page, wishlist and persistent device cart | Implemented |
 | COD checkout, purchase snapshots, order history, cancellation | Implemented with MongoDB transactions and retry protection |
@@ -32,7 +42,8 @@ The top bar now has a labelled Log out button on desktop and mobile. The bag ret
 | Reviews | New reviews require a delivered purchase; 30 sample reviews are labelled demo |
 | Sample content | 4 fictional shops, 10 products, 3 buyers, 30 reviews and bundled photographs |
 | Worker Hiring | Profiles, schedules, bookings, reviews and complaint moderation implemented; see docs/HIRING.md |
-| Transport / reporting | Future releases |
+| Safety Reporting | Implemented; see docs/SAFETY.md |
+| Safe Transport | Future release |
 | Build | Successful in the authoring environment |
 | API guard tests | 4 tests passed |
 | Browser checks | Passed at desktop/mobile sizes using fixture API responses; see docs/TESTING.md |
@@ -113,7 +124,7 @@ You can also create a fresh account through signup. A new account has no fake or
 ## Recommended first walkthrough
 
 1. Browse Marketplace without signing in; search for “mug” and open a detail page.
-2. Sign up. Check the four-module dashboard. Marketplace and Worker Hiring open their modules; Transport and Reporting show availability notices.
+2. Sign up. Check the four-module dashboard. Marketplace, Worker Hiring and Safety open their modules; Transport shows an availability notice.
 3. Save a product, add it to the bag and place a COD order. Your bag can hold products from several shops. Use the checkout button for the shop you want to order from; the other items remain in your bag.
 4. Sign out and sign in as that product's seller. Open My shop → Manage sales → order. Confirm, ship and deliver it.
 5. Sign back in as buyer. Open the delivered order and submit a review.
@@ -198,4 +209,4 @@ The authoring environment blocked the MongoDB process with `open: Operation not 
 
 ## Next checkpoint
 
-**Stopped after Worker Hiring.** Review Release 2 with the walkthrough in docs/HIRING-SETUP.md. Marketplace issues were deferred at the user’s request; this update does not claim to resolve them. Safety Reporting and Safe Transport remain future work.
+**Stopped after Safety Reporting.** Review Release 3 using docs/SAFETY-SETUP.md. Safe Transport remains the next module. Previous-module issues remain deferred unless explicitly fixed. All further development stays off main until the owner requests the final merge.

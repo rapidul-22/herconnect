@@ -62,3 +62,8 @@ All future modules need their own detailed acceptance cases when scheduled; thei
 
 ## Explicit exclusions
 Native app, real payment processing, courier integration, automatic emergency response, live ride tracking, worker bookings, incident submission, cross-module search, chat, recommendation AI, automated identity checks and real operational guarantees. Basic admin, password recovery and product upload ARE included in Release 1.
+
+
+## Release 3 scope
+
+Safety Reporting is implemented: account-linked anonymous/named reports, public feed, private tracking, map point selection, computed hotspots, resource lookup, moderation and resource administration. Safe Transport remains future work. All development stays on feature branches; main is unchanged until final user-authorized integration. See SAFETY.md for acceptance rules and SAFETY-SETUP.md for checks.

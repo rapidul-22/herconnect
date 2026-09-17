@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { app } from "./app.js";
 import { initModels } from "./models.js";
 import { initHiringModels } from "./hiring-models.js";
+import { initSafetyModels } from "./safety-models.js";
 if (!process.env.MONGODB_URI || process.env.MONGODB_URI.includes("USERNAME:")) {
   console.error("Set MONGODB_URI in .env. See README.md.");
   process.exit(1);
@@ -12,6 +13,7 @@ try {
   });
   await initModels();
   await initHiringModels();
+  await initSafetyModels();
   const server = app.listen(Number(process.env.PORT || 4000), () =>
     console.log("HerConnect API ready on port " + (process.env.PORT || 4000)),
   );

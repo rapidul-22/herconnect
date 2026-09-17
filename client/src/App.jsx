@@ -53,6 +53,7 @@ import {
 } from "./market-pages.jsx";
 import { Seller, ProductEditor, Admin } from "./seller-pages.jsx";
 import { HiringDirectory, WorkerDetail, WorkerMine, HiringBookings, HiringBookingDetail, HiringComplaints, HiringAdmin } from "./hiring-pages.jsx";
+import { SafetyFeed, SafetyNew, SafetyMine, SafetyDetail, SafetyZones, SafetyResources, SafetyAdmin } from "./safety-pages.jsx";
 export function Logo() {
   return (
     <Link to="/" className="logo">
@@ -106,13 +107,14 @@ function Layout() {
     ["/dashboard", LayoutDashboard, "My dashboard"],
     ["/marketplace", ShoppingBag, "Marketplace"],
     ["/hiring", HandHeart, "Worker hiring"],
+    ["/safety", ShieldCheck, "Safety & support"],
     ...(!user?.isAdmin
       ? [
           ["/wishlist", Heart, "Saved favourites"],
           ["/orders", Package, "My orders"],
           ["/seller", Store, "My shop"],
         ]
-      : [["/admin", ShieldCheck, "Shop moderation"], ["/admin/hiring", HandHeart, "Worker moderation"]]),
+      : [["/admin", ShieldCheck, "Shop moderation"], ["/admin/hiring", HandHeart, "Worker moderation"], ["/admin/safety", ShieldCheck, "Safety moderation"]]),
   ];
   return (
     <div className="app-layout">
@@ -268,6 +270,8 @@ function Dashboard() {
     },
     {
       name: "Safety & support",
+      live: true,
+      path: "/safety",
       desc: "A space to report concerns and find help.",
       icon: ShieldCheck,
       tone: "sage",
@@ -403,8 +407,7 @@ function ComingSoon() {
         is on its way.
       </h1>
       <p>
-        Transport and safety reporting are planned for future
-        releases. These services are not available yet.
+        Safe Transport is planned for a future release. This service is not available yet.
       </p>
       <Link className="btn primary" to="/dashboard">
         Back to your dashboard
@@ -471,6 +474,10 @@ export default function App() {
             }
           />
           <Route path="marketplace" element={<Marketplace />} />
+          <Route path="safety" element={<SafetyFeed />} />
+          <Route path="safety/zones" element={<SafetyZones />} />
+          <Route path="safety/resources" element={<SafetyResources />} />
+          <Route path="safety/reports/:id" element={<SafetyDetail />} />
           <Route path="hiring" element={<HiringDirectory />} />
           <Route path="hiring/workers/:id" element={<WorkerDetail />} />
           <Route path="marketplace/:id" element={<ProductDetail />} />
@@ -479,6 +486,8 @@ export default function App() {
           <Route path="privacy" element={<InfoPage type="privacy" />} />
           <Route path="terms" element={<InfoPage type="terms" />} />
           <Route element={<Guard />}>
+            <Route path="safety/new" element={<SafetyNew />} />
+            <Route path="safety/mine" element={<SafetyMine />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="coming-soon/:module" element={<ComingSoon />} />
             <Route path="profile" element={<Profile />} />
@@ -500,6 +509,7 @@ export default function App() {
           </Route>
           <Route element={<Guard admin />}>
             <Route path="admin" element={<Admin />} />
+            <Route path="admin/safety" element={<SafetyAdmin />} />
             <Route path="admin/hiring" element={<HiringAdmin />} />
           </Route>
           <Route
