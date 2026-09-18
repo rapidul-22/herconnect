@@ -37,3 +37,13 @@ All paths start /api. JSON requests except multipart image upload. Money is inte
 | GET | /admin/audits | Admin decision history |
 
 No admin signup endpoint. scripts/admin.js explicitly creates the moderator from environment values. Seed command is opt-in and does not drop collections. Use a separate development database.
+
+
+## Safety Reporting API
+
+See SAFETY.md for /api/reports, /api/zones/unsafe and /api/resources routes, privacy projections, filters and admin permissions.
+
+
+## Release 4 transport API
+
+Transport routes are mounted at /api/transport. See TRANSPORT.md for driver profiles, estimates, transactional ride requests/statuses, contacts, participant alerts/reviews and admin endpoints. No public ride or location feed exists.
