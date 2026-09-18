@@ -1,8 +1,20 @@
-# HerConnect+ — Release 3: Marketplace + Hiring + Safety Reporting
+# HerConnect+ — Release 4: All Four Modules
 
-A responsive women-focused platform built with React, Express and MongoDB. Accounts, dashboard, Marketplace, Domestic Worker Hiring and Safety Reporting are implemented. Safe Transport remains a future module.
+A responsive women-focused platform built with React, Express and MongoDB. Accounts, dashboard, Marketplace, Domestic Worker Hiring, Safety Reporting and Safe Transport are implemented as a university prototype. Full-project acceptance testing is still required.
 
 **Start here:** follow the setup below. No existing Atlas collection needs to be deleted. The package contains no database passwords.
+
+## Release 4: Safe Transport
+
+Start with **docs/TRANSPORT-SETUP.md**. This incremental update adds driver application/approval, nearest-driver ride requests, transaction-protected participant locks, timestamps and location updates, timeouts/cancellation, private contacts and panic alerts, post-ride reviews and moderation.
+
+**Branch rule: create feature/safe-transport from feature/safety-reporting. Do not merge or push to main until the full project is checked and Mahin explicitly requests it.**
+
+No npm dependency or .env changes. Optional additive demo seed: `node --env-file=.env server/seed-transport.js`. Four fictional drivers start offline; use the two-browser demo walkthrough to bring one online and request a ride. Demo mode is separate from real matching.
+
+Verification: production build and 15 database-independent checks pass. Browser application/approval, ride request, tracking, alerts, completion/review and responsive checks pass with simulated APIs/location. The real Transport MongoDB integration test is included but could not start in this environment (database process exit code 100). Do not treat database concurrency or persistence as verified until your local test passes.
+
+Scope: fare uses classroom straight-line constants; no road routing, payment processing or automated SMS/police dispatch. Browser location sharing requires permission and an open page. Details and acceptance rules are in docs/TRANSPORT.md.
 
 ## Release 3: Safety Reporting
 
@@ -33,7 +45,7 @@ The top bar now has a labelled Log out button on desktop and mobile. The bag ret
 | Revised requirements, architecture, API contract, test plan | Written in docs/ |
 | Signup, login, logout, protected pages, profile, password change | Implemented |
 | Password reset | Implemented; SMTP needed for real emails; local development prints reset links in the API terminal |
-| Main dashboard with all four modules | Marketplace, Worker Hiring and Safety active; Transport future |
+| Main dashboard with all four modules | All four module routes active |
 | Marketplace search, categories, price filter, sorting, pagination | Implemented |
 | Product detail, shop page, wishlist and persistent device cart | Implemented |
 | COD checkout, purchase snapshots, order history, cancellation | Implemented with MongoDB transactions and retry protection |
@@ -43,7 +55,7 @@ The top bar now has a labelled Log out button on desktop and mobile. The bag ret
 | Sample content | 4 fictional shops, 10 products, 3 buyers, 30 reviews and bundled photographs |
 | Worker Hiring | Profiles, schedules, bookings, reviews and complaint moderation implemented; see docs/HIRING.md |
 | Safety Reporting | Implemented; see docs/SAFETY.md |
-| Safe Transport | Future release |
+| Safe Transport | Implemented; see docs/TRANSPORT.md |
 | Build | Successful in the authoring environment |
 | API guard tests | 4 tests passed |
 | Browser checks | Passed at desktop/mobile sizes using fixture API responses; see docs/TESTING.md |
@@ -124,7 +136,7 @@ You can also create a fresh account through signup. A new account has no fake or
 ## Recommended first walkthrough
 
 1. Browse Marketplace without signing in; search for “mug” and open a detail page.
-2. Sign up. Check the four-module dashboard. Marketplace, Worker Hiring and Safety open their modules; Transport shows an availability notice.
+2. Sign up. Check the four-module dashboard. All four cards open their implemented modules.
 3. Save a product, add it to the bag and place a COD order. Your bag can hold products from several shops. Use the checkout button for the shop you want to order from; the other items remain in your bag.
 4. Sign out and sign in as that product's seller. Open My shop → Manage sales → order. Confirm, ship and deliver it.
 5. Sign back in as buyer. Open the delivered order and submit a review.
@@ -209,4 +221,4 @@ The authoring environment blocked the MongoDB process with `open: Operation not 
 
 ## Next checkpoint
 
-**Stopped after Safety Reporting.** Review Release 3 using docs/SAFETY-SETUP.md. Safe Transport remains the next module. Previous-module issues remain deferred unless explicitly fixed. All further development stays off main until the owner requests the final merge.
+**All four module implementations delivered.** Run the checks in docs/TRANSPORT-SETUP.md and regression checks for earlier modules. Full project acceptance is not yet claimed. Previous-module issues remain deferred unless explicitly fixed. Keep all changes on feature branches until Mahin requests the final merge.

@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import * as L from "./vendor/leaflet/leaflet-src.esm.js";
 import "./vendor/leaflet/leaflet.css";
-export default function SafetyMap({ point, points = [], onPick }) {
+export default function SafetyMap({
+  point,
+  points = [],
+  onPick,
+  pointLabel = "Selected incident location",
+  mapLabel,
+  routeLine = false,
+}) {
   const host = useRef(null),
     map = useRef(null),
     layer = useRef(null),
@@ -40,22 +47,27 @@ export default function SafetyMap({ point, points = [], onPick }) {
     const m = map.current;
     if (!m) return;
     layer.current.clearLayers();
-    const all = (
-      point ? [{ ...point, label: "Selected incident location" }] : points
-    ).filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng));
+    const all = (point ? [{ ...point, label: pointLabel }] : points).filter(
+      (p) => Number.isFinite(p.lat) && Number.isFinite(p.lng),
+    );
     all
       .filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng))
       .forEach((p) => {
         const marker = L.circleMarker([p.lat, p.lng], {
           radius: p.count ? Math.min(24, 10 + p.count) : 9,
-          color: "#803a67",
-          fillColor: "#c7769c",
+          color: p.color || "#803a67",
+          fillColor: p.color || "#c7769c",
           fillOpacity: 0.75,
         }).addTo(layer.current);
         const label = document.createElement("span");
         label.textContent = p.label || `${p.count} reports`;
         marker.bindPopup(label);
       });
+    if (routeLine && all.length >= 2)
+      L.polyline(
+        all.slice(0, 2).map((p) => [p.lat, p.lng]),
+        { color: "#9e749d", dashArray: "6 8", weight: 3 },
+      ).addTo(layer.current);
     if (point && Number.isFinite(point.lat) && Number.isFinite(point.lng))
       m.panTo([point.lat, point.lng]);
     else if (all.length)
@@ -63,7 +75,7 @@ export default function SafetyMap({ point, points = [], onPick }) {
         all.map((p) => [p.lat, p.lng]),
         { padding: [35, 35], maxZoom: 14 },
       );
-  }, [point, points]);
+  }, [point, points, pointLabel, routeLine]);
   return (
     <div className="safety-map-wrap">
       <div
@@ -71,9 +83,10 @@ export default function SafetyMap({ point, points = [], onPick }) {
         className="safety-map"
         role="region"
         aria-label={
-          onPick
+          mapLabel ||
+          (onPick
             ? "Incident location map. You can also use the coordinate fields."
-            : "Report location map"
+            : "Report location map")
         }
       />
       {failed && (

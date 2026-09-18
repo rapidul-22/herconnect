@@ -34,3 +34,8 @@ Rose/berry primary #A63A50, dark plum text #35252E, blush #F9E9ED, ivory #FFFDFB
 ## Release 3 architecture
 
 SafetyReport and HelpResource collections, shared Haversine/DBSCAN helpers, a reporting router and React pages reuse the existing session/CSRF/query patterns. Leaflet is bundled locally; OSM supplies map tiles. See SAFETY.md for privacy boundaries and computation limits.
+
+
+## Release 4 transport integration
+
+Transport reuses the Safety map and shared Haversine function. Per-user TransportSeat records and DriverProfile.activeRide are claimed/released with TransportRide inside MongoDB transactions. Request expiry uses a restart-safe timestamp and 15-second sweep; clients poll rides every 5 seconds and explicitly share driver location every 15 seconds. See TRANSPORT.md for full invariants, privacy and limitations.

@@ -361,7 +361,7 @@ export function InfoPage({ type }) {
         ],
         [
           "Are transport and safety services available?",
-          "Marketplace, Worker Hiring and Safety Reporting are available. Safe Transport remains planned. Community reports are not sent to emergency responders.",
+          "All four modules are implemented: Marketplace, Worker Hiring, Safety Reporting and Safe Transport. Transport is a classroom ride-request prototype with location updates. Reports and panic alerts do not automatically contact emergency responders.",
         ],
         [
           "I forgot my password.",
@@ -374,11 +374,11 @@ export function InfoPage({ type }) {
       items: [
         [
           "Information we store",
-          "Your name, email, password hash, mobile number, delivery address, saved products, shop details, orders and reviews. Hiring stores profiles, schedules, bookings and complaints. Safety reports store your account reference, description, incident time, location and moderation history. Session tokens are stored hashed.",
+          "Your name, email, password hash, mobile number, delivery address, saved products, shop details, orders and reviews. Hiring stores profiles, schedules, bookings and complaints. Safety reports store your account reference, description, incident time, location and moderation history. Transport stores driver applications, private licence numbers, ride locations/status, location timestamps, panic alerts and your optional emergency contact. Session tokens are stored hashed.",
         ],
         [
           "Who can see what?",
-          "Approved shop and worker profiles, products, reviews and visible safety reports are public. Safety descriptions and area labels are public; public coordinates are approximate. Hiding your name hides account identity from public report responses, not from moderators or the database. Do not put identifying details in public text. Exact incident coordinates and report review notes are available only to the reporter and moderators. Delivery and booking contact details have separate participant access controls.",
+          "Approved shop and worker profiles, products, reviews and visible safety reports are public. Safety descriptions and area labels are public; public coordinates are approximate. Hiding your name hides account identity from public report responses, not from moderators or the database. Do not put identifying details in public text. Exact incident coordinates and report review notes are available only to the reporter and moderators. Delivery and booking contact details have separate participant access controls. Transport ride details are private to its participants; driver location is shown during accepted/ongoing rides. Moderators can inspect driver applications and panic alerts. Your saved emergency contact is shown only to you.",
         ],
         [
           "Images and sample content",
@@ -399,7 +399,7 @@ export function InfoPage({ type }) {
       items: [
         [
           "Educational prototype",
-          "HerConnect+ Release 3 demonstrates Marketplace, Worker Hiring and Safety Reporting for a university project. Labelled demo products, identities, reviews, incidents and facilities are fictional.",
+          "HerConnect+ Release 4 demonstrates Marketplace, Worker Hiring, Safety Reporting and Safe Transport for a university project. Labelled demo products, identities, reviews, incidents and facilities are fictional.",
         ],
         [
           "Purchases and delivery",
@@ -415,7 +415,7 @@ export function InfoPage({ type }) {
         ],
         [
           "Other services",
-          "Worker Hiring and Safety Reporting are implemented. Reports are community submissions, not verified allegations; review status does not imply police action. Hotspots reflect report patterns and never guarantee that other areas are safe. Safe Transport remains unavailable.",
+          "All four modules are implemented as a classroom prototype. Reports are community submissions, not verified allegations; review status does not imply police action. Hotspots never guarantee safety. Transport fares are straight-line estimates using classroom rates, not road-route fares. Driver approval is not a background check. Panic alerts are recorded in the app without automatic SMS, calls or police dispatch.",
         ],
       ],
     },
