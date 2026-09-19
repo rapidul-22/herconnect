@@ -49,6 +49,11 @@ const rideSchema = schema({
   pickup: { address: String, lat: Number, lng: Number },
   dropoff: { address: String, lat: Number, lng: Number },
   distanceKm: Number,
+  durationMinutes: Number,
+  route: [[[Number]]],
+  routeBasis: String,
+  routeProvider: String,
+  routingMode: String,
   fare: Number,
   status: {
     type: String,

@@ -1,3 +1,4 @@
+import { mockRoadProvider } from "./helpers/road-provider.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import express from "express";
@@ -11,6 +12,7 @@ import {
 } from "../server/transport-models.js";
 process.env.NODE_ENV = "test";
 test("actual ride creation route chooses nearest profile, snapshots server fare and preserves retry identity (mock storage)", async (t) => {
+  mockRoadProvider(t);
   const user = "111111111111111111111111",
     driver = "222222222222222222222222";
   let stored = null,
@@ -80,6 +82,7 @@ test("actual ride creation route chooses nearest profile, snapshots server fare 
     vehicleType: "Car",
     requestKey: crypto.randomUUID(),
     fare: 1,
+    quotedFare: 14000,
     driver: "spoofed",
     status: "completed",
   };
@@ -88,7 +91,7 @@ test("actual ride creation route chooses nearest profile, snapshots server fare 
   const r = await send();
   assert.equal(r.status, 201, JSON.stringify(r.body));
   assert.equal(claimed, candidates[1]._id);
-  assert.equal(r.body.fare, 11300);
+  assert.equal(r.body.fare, 14000);
   assert.equal(r.body.driver, driver);
   assert.equal(r.body.status, "requested");
   assert.equal(r.body.driverLiveLocation, undefined);

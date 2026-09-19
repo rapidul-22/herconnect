@@ -69,10 +69,7 @@ export function AuthPage({ mode }) {
       }
       query.removeQueries({ predicate: (q) => q.queryKey[0] !== "session" });
       query.setQueryData(["session"], data);
-      const next = params.get("next");
-      navigate(
-        next?.startsWith("/") && !next.startsWith("//") ? next : "/dashboard",
-      );
+      navigate("/dashboard", { replace: true });
     },
     mode === "reset"
       ? "Password updated. Sign in with your new password."
@@ -121,7 +118,7 @@ export function AuthPage({ mode }) {
         <small>Made for women. Open to possibilities.</small>
       </section>
       <main id="main" className="auth-form-side">
-        <Link to="/marketplace" className="back-link">
+        <Link to="/dashboard" className="back-link">
           <ArrowLeft size={16} />
           Back to explore
         </Link>
@@ -131,6 +128,7 @@ export function AuthPage({ mode }) {
           </div>
           <h2>{title}</h2>
           <p>{description}</p>
+          <p className="small-copy">One account for shopping, hiring, safety and transport. No separate module signups.</p>
           {message ? (
             <div className="notice">
               <Check size={22} />
@@ -265,6 +263,7 @@ export function Profile() {
         title="A little about you."
         description="Keep your details up to date for a smoother experience."
       />
+      <div className="notice"><div><h2>Your account works everywhere</h2><p>Use this login across all four modules. Apply for service profiles without creating another account.</p><p><Link to="/seller">My shop</Link> · <Link to="/hiring/mine">My worker profile</Link> · <Link to="/transport/drive">My driver profile</Link> · <Link to="/safety/mine">My safety reports</Link></p></div></div>
       <div className="profile-grid">
         <form
           className="panel form-panel"
@@ -343,6 +342,7 @@ export function InfoPage({ type }) {
     help: {
       title: "A little help, right here.",
       items: [
+        ["One account, four modules", "A regular member uses one login to buy or sell, hire or offer services, submit safety reports, and ride or apply to drive. Shop, worker and driver applications still require approval. Moderator accounts remain dedicated to administration."],
         [
           "How do I place an order?",
           "Add products from different shops to your bag. Use each shop’s checkout button to place a separate order with your delivery details. Delivery costs BDT 60 per shop order. Orders use cash on delivery. This course prototype does not dispatch a real courier.",
@@ -386,7 +386,7 @@ export function InfoPage({ type }) {
         ],
         [
           "Cookies and local storage",
-          "A required HTTP-only cookie keeps you signed in. Your bag is saved on the current device per account. No advertising trackers are included. Maps load tiles directly from OpenStreetMap, which receives your browser network information and the viewed map area. Device location is requested only when you choose Use my location.",
+          "A required HTTP-only cookie keeps you signed in. Your bag is saved on the current device per account. No advertising trackers are included. Maps load tiles directly from OpenStreetMap, which receives your browser network information and the viewed map area. Device location is requested only when you choose a location-sharing control. Signed-in address searches and selected ride coordinates are sent through our server to Geoapify for suggestions and road routes. Provider data quality and availability vary.",
         ],
         [
           "Deletion and support",
@@ -415,7 +415,7 @@ export function InfoPage({ type }) {
         ],
         [
           "Other services",
-          "All four modules are implemented as a classroom prototype. Reports are community submissions, not verified allegations; review status does not imply police action. Hotspots never guarantee safety. Transport fares are straight-line estimates using classroom rates, not road-route fares. Driver approval is not a background check. Panic alerts are recorded in the app without automatic SMS, calls or police dispatch.",
+          "All four modules are implemented as a classroom prototype. Reports are community submissions, not verified allegations; review status does not imply police action. Hotspots never guarantee safety. New Transport fares use provider road distance and classroom rates. Travel times are not live traffic predictions. CNG uses a car-route approximation and rickshaw uses bicycle routing; local restrictions may differ. Older/demo rides retain their original straight-line estimates. Driver approval is not a background check. Panic alerts are recorded in the app without automatic SMS, calls or police dispatch.",
         ],
       ],
     },

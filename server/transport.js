@@ -15,11 +15,11 @@ import {
 import {
   vehicleTypes,
   activeRideStatuses,
-  fareQuote,
   nearestDrivers,
   locationFresh,
   canRideTransition,
 } from "../shared/transport.js";
+import { roadQuote, addressSuggestions } from "./transport-routing.js";
 export const transport = Router();
 const id = z.string().regex(/^[a-f0-9]{24}$/i, "Invalid record ID.");
 const text = (min, max) => z.string().trim().min(min).max(max);
@@ -34,6 +34,7 @@ export const rideInput = z.object({
   vehicleType: z.enum(vehicleTypes),
   requestKey: z.uuid(),
   demo: z.boolean().default(false),
+  quotedFare: z.number().int().nonnegative().optional(),
 });
 export const driverInput = z.object({
   displayName: text(2, 80),
@@ -46,13 +47,6 @@ const same = (a, b) => !!a && !!b && String(a) === String(b);
 const publicFields = "_id displayName bio vehicleType isDemo";
 const pageInput = z.coerce.number().int().min(1).max(10000).default(1);
 const tx = (fn) => mongoose.connection.transaction(fn);
-const quote = (a, b, v) => {
-  try {
-    return fareQuote(a, b, v);
-  } catch (e) {
-    fail(400, e.message);
-  }
-};
 export function rideView(r) {
   const { driverLiveLocation, requestKey, ...rest } = r;
   return {
@@ -345,13 +339,22 @@ transport.patch("/driver/location", member, async (req, res) => {
     );
   res.json({ location });
 });
-transport.post("/estimate", member, (req, res) => {
-  const d = rideInput.omit({ requestKey: true, demo: true }).parse(req.body);
-  res.json({
-    ...quote(d.pickup, d.dropoff, d.vehicleType),
-    currency: "BDT",
-    basis: "straight-line",
-    payment: "cash demonstration",
+const mapsLimit = rateLimit({
+  windowMs: 60000, limit: 40,
+  keyGenerator: req => String(req.user._id),
+  standardHeaders: "draft-8", legacyHeaders: false,
+  message: { error: "Too many map requests. Wait a minute and try again." },
+  skip: () => process.env.NODE_ENV === "test",
+});
+transport.get("/places", member, mapsLimit, async (req, res) => {
+  const q = text(3, 160).parse(req.query.q);
+  res.set("Cache-Control", "no-store").json({ places: await addressSuggestions(q) });
+});
+transport.post("/estimate", member, mapsLimit, async (req, res) => {
+  const d = rideInput.omit({ requestKey: true, demo: true, quotedFare: true }).parse(req.body);
+  res.set("Cache-Control", "no-store").json({
+    ...await roadQuote(d.pickup, d.dropoff, d.vehicleType),
+    currency: "BDT", basis: "road", payment: "cash demonstration",
   });
 });
 const requestLimit = rateLimit({
@@ -368,7 +371,9 @@ transport.post("/rides", member, requestLimit, async (req, res) => {
     key = { passenger: req.user._id, requestKey: data.requestKey },
     existing = await Ride.findOne(key).lean();
   if (existing) return res.json(rideView(existing));
-  const fare = quote(data.pickup, data.dropoff, data.vehicleType);
+  if (data.quotedFare === undefined) fail(409, "Calculate the road fare before requesting a ride.");
+  const fare = await roadQuote(data.pickup, data.dropoff, data.vehicleType);
+  if (data.quotedFare !== fare.fare) fail(409, "The fare changed. Calculate it again and confirm the new price.");
   await expireTransportRequests();
   await ensureSeat(req.user._id);
   let result;

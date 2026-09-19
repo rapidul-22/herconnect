@@ -1,3 +1,4 @@
+import { mockRoadProvider } from "./helpers/road-provider.js";
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import mongoose from "mongoose";
@@ -36,6 +37,7 @@ const payload = () => ({
   vehicleType: "Car",
   requestKey: crypto.randomUUID(),
   fare: 1,
+  quotedFare: 14000,
 });
 const online = () =>
   write(driver, "patch", "/driver/online", {
@@ -61,7 +63,8 @@ after(async () => {
   await mongoose.disconnect();
   await repl?.stop();
 });
-test("driver approval, concurrent matching, cross-role lock, private tracking, panic, completion, review, timeout and suspension", async () => {
+test("driver approval, concurrent matching, cross-role lock, private tracking, panic, completion, review, timeout and suspension", async (t) => {
+  mockRoadProvider(t);
   await write(driver, "put", "/driver", {
     displayName: "Test Driver",
     bio: "Fictional driving service for integration testing.",
@@ -113,7 +116,7 @@ test("driver approval, concurrent matching, cross-role lock, private tracking, p
     passenger = [p1, p2][index],
     other = [p1, p2][1 - index],
     ride = race[index].body;
-  assert.equal(ride.fare, 11300);
+  assert.equal(ride.fare, 14000);
   assert.equal(ride.driverLiveLocation, undefined);
   assert.equal(await Seat.countDocuments({ ride: ride._id }), 2);
   await write(driver, "post", "/rides", payload()).expect(409);
