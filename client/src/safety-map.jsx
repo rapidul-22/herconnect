@@ -8,6 +8,7 @@ export default function SafetyMap({
   pointLabel = "Selected incident location",
   mapLabel,
   routeLine = false,
+  route = [],
 }) {
   const host = useRef(null),
     map = useRef(null),
@@ -63,7 +64,8 @@ export default function SafetyMap({
         label.textContent = p.label || `${p.count} reports`;
         marker.bindPopup(label);
       });
-    if (routeLine && all.length >= 2)
+    if (route.length) L.polyline(route, { color: "#925287", weight: 5, opacity: 0.85 }).addTo(layer.current);
+    if (!route.length && routeLine && all.length >= 2)
       L.polyline(
         all.slice(0, 2).map((p) => [p.lat, p.lng]),
         { color: "#9e749d", dashArray: "6 8", weight: 3 },
@@ -72,10 +74,10 @@ export default function SafetyMap({
       m.panTo([point.lat, point.lng]);
     else if (all.length)
       m.fitBounds(
-        all.map((p) => [p.lat, p.lng]),
+        [...all.map((p) => [p.lat, p.lng]), ...route.flat()],
         { padding: [35, 35], maxZoom: 14 },
       );
-  }, [point, points, pointLabel, routeLine]);
+  }, [point, points, pointLabel, routeLine, route]);
   return (
     <div className="safety-map-wrap">
       <div

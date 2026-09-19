@@ -1,3 +1,5 @@
+> Latest incremental update: Issues 3, 4 and 5. See [dashboard, road routing and shared-account notes](docs/ISSUES-3-4-5.md). New road quotes and address suggestions require a server-side `GEOAPIFY_API_KEY`. Live provider and MongoDB verification must be completed locally before accepting this update. Main remains unchanged.
+
 # HerConnect+ — Release 4: All Four Modules
 
 A responsive women-focused platform built with React, Express and MongoDB. Accounts, dashboard, Marketplace, Domestic Worker Hiring, Safety Reporting and Safe Transport are implemented as a university prototype. Full-project acceptance testing is still required.

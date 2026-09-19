@@ -1,3 +1,4 @@
+import { AddressSearch } from "./address-search.jsx";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -91,7 +92,7 @@ function Notice() {
     <div className="safety-notice">
       <ShieldCheck size={20} />
       <span>
-        University prototype. Fares use straight-line distance, not road routes.
+        University prototype. New fares use road distance. Travel times are estimates, not live traffic.
         Alerts are recorded in the app; no SMS or police dispatch is sent.
       </span>
     </div>
@@ -196,14 +197,7 @@ function PointFields({ title, value, onChange }) {
         <MapPin size={17} />
         {title}
       </h3>
-      <Field
-        label={title + " address or landmark"}
-        required
-        minLength={3}
-        maxLength={160}
-        value={value.address}
-        onChange={(e) => onChange({ ...value, address: e.target.value })}
-      />
+      <AddressSearch title={title} value={value} onChange={onChange} />
       <div className="safety-fields">
         <Field
           label={title + " latitude"}
@@ -272,8 +266,8 @@ export function TransportHome() {
   const { user, notify } = useApp(),
     navigate = useNavigate(),
     [vehicle, setVehicle] = useState("Car"),
-    [pickup, setPickup] = useState({ address: "", lat: 23.8103, lng: 90.4125 }),
-    [dropoff, setDropoff] = useState({ address: "", lat: 23.746, lng: 90.376 }),
+    [pickup, setPickup] = useState({ address: "", lat: "", lng: "" }),
+    [dropoff, setDropoff] = useState({ address: "", lat: "", lng: "" }),
     [target, setTarget] = useState("pickup"),
     [demo, setDemo] = useState(false),
     [estimate, setEstimate] = useState(null),
@@ -370,7 +364,8 @@ export function TransportHome() {
                 type="button"
                 onClick={async () => {
                   try {
-                    change(setPickup, { ...pickup, ...(await locate()) });
+                    const point = await locate();
+                    change(setPickup, { ...point, address: `My pickup (${point.lat.toFixed(5)}, ${point.lng.toFixed(5)})` });
                   } catch (e) {
                     notify(e.message, "error");
                   }
@@ -380,19 +375,19 @@ export function TransportHome() {
               </button>
             </div>
             <Map
-              routeLine
+              route={estimate?.inputKey === JSON.stringify(data()) ? estimate.route : []}
               points={[
                 { ...pickup, label: "Pickup", color: "#577e72" },
                 { ...dropoff, label: "Dropoff", color: "#925287" },
               ]}
               onPick={(p) =>
                 target === "pickup"
-                  ? change(setPickup, { ...pickup, ...p })
-                  : change(setDropoff, { ...dropoff, ...p })
+                  ? change(setPickup, { ...p, address: `Map pickup (${p.lat}, ${p.lng})` })
+                  : change(setDropoff, { ...p, address: `Map dropoff (${p.lat}, ${p.lng})` })
               }
             />
             <small>
-              Dashed line shows straight-line distance, not a road route.
+              Calculate your fare to show the road route. Search suggestions and routes: Geoapify / OpenStreetMap.
             </small>
             <PointFields
               title="Pickup"
@@ -444,20 +439,21 @@ export function TransportHome() {
             )}
             <label className="safety-check">
               <input type="checkbox" required /> I checked both locations and
-              understand the straight-line estimate.
+              understand the estimated fare.
             </label>
             <Submit pending={estimateAction.isPending}>Calculate fare</Submit>
             {estimate && estimate.inputKey === JSON.stringify(data()) && (
               <div className="transport-fare">
                 <span>Estimated fare · cash demonstration</span>
                 <strong>{money(estimate.fare)}</strong>
-                <p>{estimate.distanceKm} km straight-line distance</p>
+                <p>{estimate.distanceKm} km by road · about {estimate.durationMinutes} min</p>
+                <small>Route by <a href="https://www.geoapify.com/" target="_blank" rel="noreferrer">Geoapify</a> / OpenStreetMap. {vehicle === "CNG" ? "CNG uses a car-route approximation; local restrictions may differ." : vehicle === "Rickshaw" ? "Rickshaw uses a bicycle-route approximation; local restrictions and journey time may differ." : "Travel time does not include live traffic."}</small>
                 <button
                   className="btn primary"
                   type="button"
                   disabled={requestRide.isPending || estimateAction.isPending}
                   onClick={() =>
-                    requestRide.mutate({ ...data(), demo, requestKey })
+                    requestRide.mutate({ ...data(), demo, requestKey, quotedFare: estimate.fare })
                   }
                 >
                   {requestRide.isPending
@@ -466,7 +462,7 @@ export function TransportHome() {
                   <ArrowRight size={16} />
                 </button>
                 <small>
-                  Nearest eligible driver within 10 km. Request expires after 2
+                  Drivers are ranked by proximity within 10 km, not road arrival time. Request expires after 2
                   minutes if unaccepted.
                 </small>
               </div>
@@ -1158,7 +1154,7 @@ export function TransportRideDetail() {
                 {r.status.replaceAll("_", " ")}
               </span>
               <strong>{money(r.fare)}</strong>
-              <span>{r.distanceKm} km · straight-line estimate</span>
+              <span>{r.distanceKm} km · {r.routeBasis === "road" ? `road route · about ${r.durationMinutes} min` : "legacy straight-line estimate"}</span>
             </div>
             {r.status === "requested" && (
               <p>
@@ -1187,7 +1183,7 @@ export function TransportRideDetail() {
                   <strong>{r.dropoff.address}</strong>
                 </div>
                 <Map
-                  routeLine
+                  route={r.route || []}
                   points={[
                     { ...r.pickup, label: "Pickup", color: "#577e72" },
                     { ...r.dropoff, label: "Dropoff", color: "#925287" },
@@ -1203,7 +1199,7 @@ export function TransportRideDetail() {
                       : []),
                   ]}
                 />
-                <small>The dashed line is not a driving route.</small>
+                <small>{r.routeBasis === "road" ? "Road route by Geoapify / OpenStreetMap. Travel time is an estimate; CNG uses car routing and rickshaw uses bicycle routing." : "This older/demo ride was stored before road routing. No road geometry is available."}</small>
                 {["accepted", "ongoing"].includes(r.status) && (
                   <p role="status">
                     Driver location:{" "}

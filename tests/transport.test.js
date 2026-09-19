@@ -1,3 +1,4 @@
+import { mockRoadProvider } from "./helpers/road-provider.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import request from "supertest";
@@ -94,7 +95,8 @@ test("fare, role transitions, location privacy and strict request validation", (
     false,
   );
 });
-test("transport endpoint guards and actual estimate route reject spoofed fare and invalid points", async () => {
+test("transport endpoint guards and actual estimate route reject spoofed fare and invalid points", async (t) => {
+  mockRoadProvider(t);
   for (const p of [
     "/driver",
     "/contact",
@@ -138,7 +140,7 @@ test("transport endpoint guards and actual estimate route reject spoofed fare an
       fare: 1,
     })
     .expect(200);
-  assert.equal(res.body.fare, 11300);
+  assert.equal(res.body.fare, 14000);
   await request(isolated).post("/estimate").send({}).expect(403);
   await request(isolated)
     .post("/estimate")

@@ -1,3 +1,4 @@
+import { Dashboard } from "./dashboard.jsx";
 import { useEffect, useState } from "react";
 import {
   Link,
@@ -244,162 +245,6 @@ function Layout() {
     </div>
   );
 }
-function Dashboard() {
-  const { user } = useApp();
-  const products = useQuery({
-    queryKey: ["products", "dashboard"],
-    queryFn: () => api("/products"),
-  });
-  const orders = useQuery({
-    queryKey: ["orders"],
-    queryFn: () => api("/orders"),
-    enabled: !user.isAdmin,
-  });
-  const modules = [
-    {
-      name: "Marketplace",
-      desc: "Discover thoughtful finds from women-led shops.",
-      icon: ShoppingBag,
-      tone: "rose",
-      live: true,
-      path: "/marketplace",
-    },
-    {
-      name: "Safe transport",
-      live: true,
-      path: "/transport",
-      desc: "A more confident way to get where you need to go.",
-      icon: CarFront,
-      tone: "lavender",
-    },
-    {
-      name: "Safety & support",
-      live: true,
-      path: "/safety",
-      desc: "A space to report concerns and find help.",
-      icon: ShieldCheck,
-      tone: "sage",
-    },
-    {
-      name: "Worker hiring",
-      desc: "Explore service providers and request help for your home.",
-      live: true,
-      path: "/hiring",
-      icon: HandHeart,
-      tone: "peach",
-    },
-  ];
-  return (
-    <>
-      <PageTitle
-        eyebrow="YOUR HERCONNECT+"
-        title={`Hello, ${user.name.split(" ")[0]}.`}
-        description="Your everyday essentials, brought a little closer."
-      />
-      <section className="dashboard-hero">
-        <div>
-          <span className="eyebrow">A COMMUNITY THAT GROWS WITH YOU</span>
-          <h2>
-            Her ideas.
-            <br />
-            Your next favourite.
-          </h2>
-          <p>
-            Meet independent makers. Find something special.{" "}
-            <br />
-            Make a difference with your everyday choices.
-          </p>
-          <Link className="btn primary" to="/marketplace">
-            Explore the marketplace
-            <ArrowRight size={18} />
-          </Link>
-        </div>
-        <div className="hero-photo">
-          <img src="/images/ceramic.jpg" alt="Handcrafted ceramic cup" />
-          <span className="photo-note">
-            Thoughtfully made.
-            <br />
-            <em>Personally chosen.</em>
-          </span>
-        </div>
-      </section>
-      <div className="section-heading">
-        <h2>Your world, connected</h2>
-        <span>Four services. One space.</span>
-      </div>
-      <div className="module-grid">
-        {modules.map((m, i) => (
-          <Link
-            key={m.name}
-            to={m.live ? m.path : "/coming-soon/" + i}
-            className={"module " + m.tone}
-          >
-            <div className="module-top">
-              <span className="module-icon">
-                <m.icon size={25} />
-              </span>
-              <span className={"status " + (m.live ? "approved" : "pending")}>
-                {m.live ? "Explore now" : "Coming next"}
-              </span>
-            </div>
-            <h3>{m.name}</h3>
-            <p>{m.desc}</p>
-            <ArrowUpRight className="module-arrow" size={19} />
-          </Link>
-        ))}
-      </div>
-      {!user.isAdmin && (
-        <div className="stats-strip">
-          <Link to="/orders">
-            <Package />
-            <span>
-              <strong>
-                {orders.data?.filter(
-                  (o) => !["cancelled", "delivered"].includes(o.status),
-                ).length ?? "—"}
-              </strong>
-              Active orders
-            </span>
-            <ArrowRight />
-          </Link>
-          <Link to="/wishlist">
-            <Heart />
-            <span>
-              <strong>{user.wishlist.length}</strong>Saved favourites
-            </span>
-            <ArrowRight />
-          </Link>
-          <Link to="/seller">
-            <Store />
-            <span>
-              <strong>
-                {user.shop.status === "none"
-                  ? "Your next chapter"
-                  : user.shop.status}
-              </strong>
-              {user.shop.status === "none"
-                ? "Open your own shop"
-                : "Shop application"}
-            </span>
-            <ArrowRight />
-          </Link>
-        </div>
-      )}
-      <div className="section-heading">
-        <h2>A few lovely discoveries</h2>
-        <Link to="/marketplace">
-          View all finds
-          <ArrowRight size={17} />
-        </Link>
-      </div>
-      <QueryState query={products}>
-        {products.data && (
-          <ProductGrid products={products.data.products.slice(0, 4)} />
-        )}
-      </QueryState>
-    </>
-  );
-}
 export default function App() {
   const session = useQuery({
     queryKey: ["session"],
@@ -452,11 +297,12 @@ export default function App() {
             index
             element={
               <Navigate
-                to={session.data.user ? "/dashboard" : "/marketplace"}
+                to="/dashboard"
                 replace
               />
             }
           />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="marketplace" element={<Marketplace />} />
           <Route path="transport" element={<TransportHome />} />
           <Route path="transport/drivers/:id" element={<TransportDriverDetail />} />
@@ -478,7 +324,6 @@ export default function App() {
             <Route path="transport/contact" element={<TransportContact />} />
             <Route path="transport/rides" element={<TransportRides />} />
             <Route path="transport/rides/:id" element={<TransportRideDetail />} />
-            <Route path="dashboard" element={<Dashboard />} />
             <Route path="coming-soon/:module" element={<Navigate to="/dashboard" replace />} />
             <Route path="profile" element={<Profile />} />
             <Route path="hiring/mine" element={<WorkerMine />} />

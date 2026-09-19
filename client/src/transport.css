@@ -341,3 +341,11 @@
     transition: none;
   }
 }
+
+.address-search { position:relative;margin-bottom:16px; }
+.address-search label { display:block;font-weight:600;margin-bottom:8px;font-size:14px; }
+.address-search input { width:100%;min-width:0;padding:12px;border:1px solid #d9cbd7;border-radius:10px;font:inherit; }
+.address-search ul { list-style:none;margin:6px 0;padding:5px;border:1px solid #d9cbd7;border-radius:12px;background:white;max-height:240px;overflow:auto;box-shadow:0 8px 20px #50314912; }
+.address-search li { cursor:pointer;padding:11px;border-radius:8px;font-size:14px;line-height:1.5; }
+.address-search li:hover,.address-search li[aria-selected="true"] { background:#f3e7ef; }
+.address-search small { display:block;margin-top:7px;line-height:1.5;color:#715b6b; }
