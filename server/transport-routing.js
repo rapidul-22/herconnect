@@ -1,4 +1,4 @@
-import { fareRates } from '../shared/transport.js';
+import { fareRates, availableVehicleTypes } from '../shared/transport.js';
 import { distanceKm } from '../shared/safety.js';
 import { fail } from './auth.js';
 const cache = new Map();
@@ -10,6 +10,8 @@ async function provider(path, params) {
   url.search = new URLSearchParams({ ...params, apiKey });
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+    if ([401, 403].includes(response.status)) fail(503, 'Address service is not configured correctly. Ask the project owner to check the server Geoapify key and its restrictions.');
+    if (response.status === 429) fail(503, 'Address service usage limit reached. Please try again later or choose a map point.');
     if (!response.ok) fail(503, 'Map service unavailable or its usage limit was reached. Please try later.');
     return await response.json();
   } catch (error) {
@@ -20,7 +22,7 @@ async function provider(path, params) {
 }
 export async function addressSuggestions(query) {
   const data = await provider('geocode/autocomplete', {
-    text: query, filter: 'countrycode:bd', limit: '5', format: 'json',
+    text: query, filter: 'countrycode:bd', limit: '8', format: 'json',
   });
   if (!Array.isArray(data.results)) fail(502, 'Address search returned an invalid response.');
   return data.results.filter(p => p.country_code === 'bd' && Number.isFinite(p.lat) && Number.isFinite(p.lon))
@@ -29,6 +31,7 @@ export async function addressSuggestions(query) {
 }
 export const routeModes = { Car: 'drive', CNG: 'drive', Motorbike: 'motorcycle', Rickshaw: 'bicycle' };
 export async function roadQuote(pickup, dropoff, vehicle) {
+  if (!availableVehicleTypes.includes(vehicle)) fail(400, 'Choose Car, CNG or Motorbike.');
   const direct = distanceKm(pickup, dropoff);
   if (direct < 0.1 || direct > 100) fail(400, 'Choose points between 0.1 and 100 km apart.');
   const key = JSON.stringify([pickup.lat, pickup.lng, dropoff.lat, dropoff.lng, vehicle]);
@@ -57,10 +60,15 @@ export async function roadQuote(pickup, dropoff, vehicle) {
       distanceKm(dropoff, { lat: last[1], lng: last[0] }) > 0.5) {
     fail(422, 'A selected point is too far from a routable road. Move it closer and try again.');
   }
+  const base = fareRates[vehicle].base * 100;
+  const perKm = fareRates[vehicle].perKm * 100;
+  const distanceCharge = Math.round(perKm * km);
+  const fare = Math.round((base + distanceCharge) / 100) * 100;
   const value = {
     distanceKm: Math.round(km * 100) / 100,
     durationMinutes: Math.max(1, Math.round(p.time / 60)),
-    fare: Math.round(fareRates[vehicle].base + fareRates[vehicle].perKm * km) * 100,
+    fare,
+    fareBreakdown: { base, perKm, distanceMeters: p.distance, distanceCharge, rounding: fare - base - distanceCharge },
     route: lines.map(line => line.map(([lng, lat]) => [lat, lng])),
     routeBasis: 'road', routeProvider: 'Geoapify', routingMode: mode,
   };
