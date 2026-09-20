@@ -1,5 +1,7 @@
 import { distanceKm } from "./safety.js";
 export const vehicleTypes = ["Car", "CNG", "Motorbike", "Rickshaw"];
+// Keep legacy values readable in stored profiles and rides. New requests use availableVehicleTypes.
+export const availableVehicleTypes = ["Car", "CNG", "Motorbike"];
 export const activeRideStatuses = ["requested", "accepted", "ongoing"];
 export const fareRates = {
   Car: { base: 80, perKm: 30 },

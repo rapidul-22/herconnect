@@ -9,7 +9,7 @@ import {
   DriverReview as Review,
   initTransportModels,
 } from "./transport-models.js";
-import { vehicleTypes, fareQuote } from "../shared/transport.js";
+import { availableVehicleTypes as vehicleTypes, fareQuote } from "../shared/transport.js";
 if (
   !process.env.MONGODB_URI ||
   !process.env.DEMO_PASSWORD ||
@@ -72,7 +72,7 @@ try {
           user: u._id,
           displayName: names[i],
           bio: "Fictional driver profile for testing HerConnect ride requests, location updates and reviews. No real transport service is provided.",
-          vehicleType: vehicleTypes[i],
+          vehicleType: vehicleTypes[i % vehicleTypes.length],
           vehicleNumber: "DEMO-VEHICLE-" + (i + 1),
           licenseNumber: "DEMO-LICENCE-" + (i + 1),
           status: "approved",

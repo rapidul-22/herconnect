@@ -4,10 +4,11 @@ export function AddressSearch({ title, value, onChange }) {
   const { user } = useApp(), id = useId();
   const [open, setOpen] = useState(false), [items, setItems] = useState([]),
     [active, setActive] = useState(-1), [message, setMessage] = useState('');
+  const [failed, setFailed] = useState(false), [attempt, setAttempt] = useState(0);
   const valid = Number.isFinite(value.lat) && Number.isFinite(value.lng);
   useEffect(() => {
-    setItems([]); setActive(-1); setMessage('');
-    if (!open || valid || !user || value.address.trim().length < 3) return;
+    setItems([]); setActive(-1); setMessage(''); setFailed(false);
+    if (!open || valid || !user || value.address.trim().length < 2) return;
     const controller = new AbortController();
     const timer = setTimeout(async () => {
       setMessage('Finding addresses…');
@@ -16,10 +17,10 @@ export function AddressSearch({ title, value, onChange }) {
         if (!controller.signal.aborted) {
           setItems(data.places); setMessage(data.places.length ? 'Choose an address below.' : 'No matches. Try another landmark or choose a map point.');
         }
-      } catch (e) { if (!controller.signal.aborted) setMessage(e.message); }
-    }, 400);
+      } catch (e) { if (!controller.signal.aborted) { setMessage(e.message); setFailed(true); } }
+    }, 250);
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [value.address, valid, open, user?._id]);
+  }, [value.address, valid, open, user?._id, attempt]);
   const choose = item => { onChange(item); setOpen(false); setItems([]); setMessage(''); };
   return <div className="address-search" onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false); }}>
     <label htmlFor={id}>{title} address or landmark</label>
@@ -39,6 +40,7 @@ export function AddressSearch({ title, value, onChange }) {
       {items.map((p, i) => <li id={id + '-option-' + i} key={i} role="option" aria-selected={i === active}
         onMouseDown={e => e.preventDefault()} onClick={() => choose(p)}>{p.address}</li>)}
     </ul>}
-    <small role="status">{!user ? 'Sign in for address suggestions, or choose a point on the map.' : valid ? 'Location selected. You can adjust it on the map.' : message || 'Type at least 3 characters and select a suggestion.'}</small>
+    {failed && open && <button type="button" className="btn" onClick={() => setAttempt(n => n + 1)}>Retry address search</button>}
+    <small role="status">{!user ? 'Sign in for address suggestions, or choose a point on the map.' : valid ? 'Location selected. You can adjust it on the map.' : message || 'Type at least 2 characters. Matching places appear here as you type.'}</small>
   </div>;
 }

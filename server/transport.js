@@ -13,7 +13,7 @@ import {
   TransportContact as Contact,
 } from "./transport-models.js";
 import {
-  vehicleTypes,
+  availableVehicleTypes as vehicleTypes,
   activeRideStatuses,
   nearestDrivers,
   locationFresh,
@@ -149,7 +149,7 @@ transport.get("/drivers", async (req, res) => {
         page: pageInput,
       })
       .parse(req.query),
-    filter = { status: "approved", isDemo: q.demo === "true" };
+    filter = { status: "approved", isDemo: q.demo === "true", vehicleType: { $in: vehicleTypes } };
   if (q.vehicleType) filter.vehicleType = q.vehicleType;
   const [rows, total] = await Promise.all([
     Profile.find(filter)
@@ -347,7 +347,7 @@ const mapsLimit = rateLimit({
   skip: () => process.env.NODE_ENV === "test",
 });
 transport.get("/places", member, mapsLimit, async (req, res) => {
-  const q = text(3, 160).parse(req.query.q);
+  const q = text(2, 160).parse(req.query.q);
   res.set("Cache-Control", "no-store").json({ places: await addressSuggestions(q) });
 });
 transport.post("/estimate", member, mapsLimit, async (req, res) => {

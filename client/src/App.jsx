@@ -136,7 +136,6 @@ function Layout() {
             <NavLink end={path === "/marketplace"} key={path} to={path}>
               <Icon size={19} />
               {label}
-              {path === "/marketplace" && <span className="nav-new">NEW</span>}
             </NavLink>
           ))}
         </nav>

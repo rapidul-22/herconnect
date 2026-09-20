@@ -27,7 +27,7 @@ import {
   formData,
 } from "./shared.jsx";
 import {
-  vehicleTypes,
+  availableVehicleTypes as vehicleTypes,
   activeRideStatuses,
   fareRates,
   locationFresh,
@@ -198,38 +198,7 @@ function PointFields({ title, value, onChange }) {
         {title}
       </h3>
       <AddressSearch title={title} value={value} onChange={onChange} />
-      <div className="safety-fields">
-        <Field
-          label={title + " latitude"}
-          type="number"
-          step="any"
-          min={20}
-          max={27}
-          required
-          value={value.lat}
-          onChange={(e) =>
-            onChange({
-              ...value,
-              lat: e.target.value === "" ? "" : Number(e.target.value),
-            })
-          }
-        />
-        <Field
-          label={title + " longitude"}
-          type="number"
-          step="any"
-          min={88}
-          max={93}
-          required
-          value={value.lng}
-          onChange={(e) =>
-            onChange({
-              ...value,
-              lng: e.target.value === "" ? "" : Number(e.target.value),
-            })
-          }
-        />
-      </div>
+
     </div>
   );
 }
@@ -339,11 +308,22 @@ export function TransportHome() {
           onSubmit={(e) => {
             e.preventDefault();
             if (!user) return navigate("/login?next=/transport");
+            if (![pickup, dropoff].every(p => Number.isFinite(p.lat) && Number.isFinite(p.lng))) return notify("Select both addresses from the suggestions, or choose them on the map.", "error");
             estimateAction.mutate(data());
           }}
         >
           <div className="safety-panel">
             <h2>1. Your route</h2>
+            <PointFields
+              title="Pickup"
+              value={pickup}
+              onChange={(v) => change(setPickup, v)}
+            />
+            <PointFields
+              title="Dropoff"
+              value={dropoff}
+              onChange={(v) => change(setDropoff, v)}
+            />
             <div className="transport-map-toggle">
               <button
                 className={"btn " + (target === "pickup" ? "primary" : "")}
@@ -365,7 +345,7 @@ export function TransportHome() {
                 onClick={async () => {
                   try {
                     const point = await locate();
-                    change(setPickup, { ...point, address: `My pickup (${point.lat.toFixed(5)}, ${point.lng.toFixed(5)})` });
+                    change(setPickup, { ...point, address: "Current location" });
                   } catch (e) {
                     notify(e.message, "error");
                   }
@@ -375,6 +355,7 @@ export function TransportHome() {
               </button>
             </div>
             <Map
+              mapLabel="Ride map. Choose pickup or destination, then click the map to set it."
               route={estimate?.inputKey === JSON.stringify(data()) ? estimate.route : []}
               points={[
                 { ...pickup, label: "Pickup", color: "#577e72" },
@@ -382,26 +363,18 @@ export function TransportHome() {
               ]}
               onPick={(p) =>
                 target === "pickup"
-                  ? change(setPickup, { ...p, address: `Map pickup (${p.lat}, ${p.lng})` })
-                  : change(setDropoff, { ...p, address: `Map dropoff (${p.lat}, ${p.lng})` })
+                  ? change(setPickup, { ...p, address: "Pickup selected on map" })
+                  : change(setDropoff, { ...p, address: "Destination selected on map" })
               }
             />
             <small>
               Calculate your fare to show the road route. Search suggestions and routes: Geoapify / OpenStreetMap.
             </small>
-            <PointFields
-              title="Pickup"
-              value={pickup}
-              onChange={(v) => change(setPickup, v)}
-            />
-            <PointFields
-              title="Dropoff"
-              value={dropoff}
-              onChange={(v) => change(setDropoff, v)}
-            />
+
           </div>
           <aside className="safety-panel">
             <h2>2. Choose your ride</h2>
+            <p>HerConnect demo rates: base fare + road distance charge, rounded to the nearest taka. No time charge, surge, tolls or extra fees are added.</p>
             <div className="transport-vehicles">
               {vehicleTypes.map((v) => (
                 <label key={v} className={vehicle === v ? "selected" : ""}>
@@ -447,7 +420,14 @@ export function TransportHome() {
                 <span>Estimated fare · cash demonstration</span>
                 <strong>{money(estimate.fare)}</strong>
                 <p>{estimate.distanceKm} km by road · about {estimate.durationMinutes} min</p>
-                <small>Route by <a href="https://www.geoapify.com/" target="_blank" rel="noreferrer">Geoapify</a> / OpenStreetMap. {vehicle === "CNG" ? "CNG uses a car-route approximation; local restrictions may differ." : vehicle === "Rickshaw" ? "Rickshaw uses a bicycle-route approximation; local restrictions and journey time may differ." : "Travel time does not include live traffic."}</small>
+                {estimate.fareBreakdown && <dl className="fare-breakdown">
+                  <div><dt>Base fare</dt><dd>{money(estimate.fareBreakdown.base)}</dd></div>
+                  <div><dt>Road distance ({estimate.fareBreakdown.distanceMeters} m × BDT {estimate.fareBreakdown.perKm / 100}/km)</dt><dd>{money(estimate.fareBreakdown.distanceCharge)}</dd></div>
+                  <div><dt>Rounding to nearest taka</dt><dd>{money(estimate.fareBreakdown.rounding)}</dd></div>
+                  <div><dt>Total · BDT</dt><dd>{money(estimate.fare)}</dd></div>
+                </dl>}
+                <small>These are project rates, not official Uber or Pathao prices. The server checks the quote again when you request the ride.</small>
+                <small>Route by <a href="https://www.geoapify.com/" target="_blank" rel="noreferrer">Geoapify</a> / OpenStreetMap. {vehicle === "CNG" ? "CNG uses a car-route approximation; local restrictions may differ." : "Travel time does not include live traffic."}</small>
                 <button
                   className="btn primary"
                   type="button"
@@ -626,43 +606,17 @@ function DriverEditor({ profile }) {
   );
 }
 function DemoLocation({ onSend, pending }) {
-  return (
-    <form
-      className="transport-demo-location"
-      onSubmit={(e) => {
-        e.preventDefault();
-        const d = formData(e);
-        onSend({ lat: Number(d.lat), lng: Number(d.lng), source: "demo" });
-      }}
-    >
-      <p className="safety-demo">
-        Fictional profile only: send a manual location for testing.
-      </p>
-      <div className="safety-fields">
-        <Field
-          label="Demo latitude"
-          name="lat"
-          type="number"
-          step="any"
-          min={20}
-          max={27}
-          defaultValue={23.8103}
-          required
-        />
-        <Field
-          label="Demo longitude"
-          name="lng"
-          type="number"
-          step="any"
-          min={88}
-          max={93}
-          defaultValue={90.4125}
-          required
-        />
-      </div>
-      <Submit pending={pending}>Send demo location</Submit>
-    </form>
-  );
+  const [point, setPoint] = useState({ address: '', lat: '', lng: '' });
+  return <form className="transport-demo-location" onSubmit={e => {
+    e.preventDefault();
+    if (Number.isFinite(point.lat) && Number.isFinite(point.lng)) onSend({ lat: point.lat, lng: point.lng, source: 'demo' });
+  }}>
+    <p className="safety-demo">Fictional driver: search for a location or select it on the map.</p>
+    <AddressSearch title="Demo driver" value={point} onChange={setPoint} />
+    <Map point={point} pointLabel="Demo driver location" mapLabel="Choose a demo driver location on the map"
+      onPick={p => setPoint({ ...p, address: 'Driver location selected on map' })} />
+    <Submit pending={pending} disabled={!Number.isFinite(point.lat) || !Number.isFinite(point.lng)}>Send demo location</Submit>
+  </form>;
 }
 export function TransportDrive() {
   const q = useTransport(["own-driver"], "/driver", true),
