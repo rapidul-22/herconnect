@@ -52,13 +52,16 @@ try {
     { $setOnInsert: { ride: null } },
     { upsert: true },
   );
+  const passengers = [passenger];
+  for(let i=2;i<=6;i++) passengers.push(await demoUser(`ridepassenger${i}@herconnect.demo`,`Demo Passenger ${i}`));
   const names = [
     "Farhana Rahman",
     "Nusrat Jahan",
     "Samira Akter",
-    "Maliha Hasan",
+    "Maliha Hasan", "Raisa Karim", "Tania Akter", "Nabila Ahmed", "Samia Noor",
+    "Farzana Islam", "Anika Rahman", "Zarin Sultana", "Meher Haque",
   ];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < names.length; i++) {
     const u = await demoUser(`driver${i + 1}@herconnect.demo`, names[i]);
     await Seat.updateOne(
       { user: u._id },
@@ -91,7 +94,8 @@ try {
     );
     if (!profile.isDemo)
       throw new Error("Existing driver is not a demo profile.");
-    for (let j = 0; j < 2; j++) {
+    const ridePassenger = passengers[i % passengers.length];
+    for (let j = 0; j < 3; j++) {
       const pickup = {
           address: "Demo pickup · Dhaka",
           lat: 23.8103,
@@ -104,11 +108,11 @@ try {
         },
         day = new Date(Date.now() - (j + 1) * 86400000);
       const r = await Ride.findOneAndUpdate(
-        { passenger: passenger._id, requestKey: `transport-demo-${i}-${j}` },
+        { passenger: ridePassenger._id, requestKey: `transport-demo-${i}-${j}` },
         {
           $setOnInsert: {
-            passenger: passenger._id,
-            passengerName: passenger.name,
+            passenger: ridePassenger._id,
+            passengerName: ridePassenger.name,
             driver: u._id,
             profile: profile._id,
             driverName: profile.displayName,
@@ -137,7 +141,7 @@ try {
           $setOnInsert: {
             ride: r._id,
             profile: profile._id,
-            passenger: passenger._id,
+            passenger: ridePassenger._id,
             rating: j ? 4 : 5,
             comment: j
               ? "Demo review: the pickup details were easy to follow."
@@ -150,10 +154,10 @@ try {
     }
   }
   console.log(
-    "Transport demo ready: 4 fictional drivers, 1 passenger, 8 completed rides/reviews. Drivers start offline. Existing records/passwords were not overwritten.",
+    "Transport demo ready: 12 fictional drivers, 6 passengers, 36 completed rides/reviews (existing records retained). Drivers start offline. Existing records/passwords were not overwritten.",
   );
   console.log(
-    "Passenger: ridepassenger@herconnect.demo; drivers: driver1@herconnect.demo through driver4@herconnect.demo. Use the original DEMO_PASSWORD for each account.",
+    "Passenger: ridepassenger@herconnect.demo; drivers: driver1@herconnect.demo through driver12@herconnect.demo. Use the original DEMO_PASSWORD for each account.",
   );
 } catch (e) {
   console.error(

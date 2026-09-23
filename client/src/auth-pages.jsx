@@ -303,6 +303,18 @@ export function Profile() {
             defaultValue={user.address}
             maxLength={400}
           />
+          <Field label="City / area" name="city" defaultValue={user.city || ''} maxLength={100} />
+          <Field label="Occupation or area of study" name="occupation" defaultValue={user.occupation || ''} maxLength={100} />
+          <Field label="About me" name="bio" as="textarea" defaultValue={user.bio || ''} maxLength={500} />
+          <h3>Your private safety details</h3>
+          <p>Optional and visible only in your own account. Blood group is self-reported, not medically verified. Save a trusted contact who has agreed to be contacted.</p>
+          <Field label="Blood group (optional)" name="bloodGroup" as="select" defaultValue={user.bloodGroup || ''}>
+            {['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(v => <option key={v} value={v}>{v || 'Prefer not to say / unknown'}</option>)}
+          </Field>
+          <Field label="Emergency contact name" name="emergencyName" defaultValue={user.emergencyName || ''} maxLength={80} />
+          <Field label="Emergency contact mobile" name="emergencyPhone" defaultValue={user.emergencyPhone || ''} pattern="01[3-9][0-9]{8}" placeholder="01XXXXXXXXX" />
+          <Field label="Relationship" name="emergencyRelation" defaultValue={user.emergencyRelation || ''} maxLength={60} />
+          <Link className="btn" to="/sos">Open SOS tools</Link>
           <Submit pending={update.isPending}>Save changes</Submit>
         </form>
         <form
@@ -374,7 +386,7 @@ export function InfoPage({ type }) {
       items: [
         [
           "Information we store",
-          "Your name, email, password hash, mobile number, delivery address, saved products, shop details, orders and reviews. Hiring stores profiles, schedules, bookings and complaints. Safety reports store your account reference, description, incident time, location and moderation history. Transport stores driver applications, private licence numbers, ride locations/status, location timestamps, panic alerts and your optional emergency contact. Session tokens are stored hashed.",
+          "Your name, email, password hash, mobile number, delivery address, saved products, shop details, orders and reviews. Hiring stores profiles, schedules, bookings and complaints. Safety reports store your account reference, description, incident time, location and moderation history. Transport stores driver applications, private licence numbers, ride locations/status, location timestamps, panic alerts and your optional emergency contact. Optional city, occupation, bio, blood group and emergency contact are stored in your account. Private report details and up to three evidence photos are stored for reporter/moderator access. Photo metadata is stripped. SOS location snapshots are prepared in your browser and shared only through actions you choose. Session tokens are stored hashed.",
         ],
         [
           "Who can see what?",

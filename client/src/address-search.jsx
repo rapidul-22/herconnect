@@ -1,4 +1,5 @@
 import { useEffect, useId, useState } from 'react';
+import { localSuggestions } from '../../shared/places.js';
 import { api, useApp } from './shared.jsx';
 export function AddressSearch({ title, value, onChange }) {
   const { user } = useApp(), id = useId();
@@ -8,16 +9,22 @@ export function AddressSearch({ title, value, onChange }) {
   const valid = Number.isFinite(value.lat) && Number.isFinite(value.lng);
   useEffect(() => {
     setItems([]); setActive(-1); setMessage(''); setFailed(false);
-    if (!open || valid || !user || value.address.trim().length < 2) return;
+    if (!open || valid || value.address.trim().length < 2) return;
+    const local = localSuggestions(value.address);
+    setItems(local);
+    setMessage(local.length ? 'Local area suggestions — confirm the exact point on the map.' : 'Searching…');
+    if (!user) { setMessage('Local areas only. Sign in to search live addresses.'); return; }
     const controller = new AbortController();
     const timer = setTimeout(async () => {
       setMessage('Finding addresses…');
       try {
         const data = await api('/transport/places?q=' + encodeURIComponent(value.address.trim()), { signal: controller.signal });
         if (!controller.signal.aborted) {
-          setItems(data.places); setMessage(data.places.length ? 'Choose an address below.' : 'No matches. Try another landmark or choose a map point.');
+          const live = data.places || [];
+          setItems([...live, ...local.filter(p => !live.some(v => v.address === p.address))].slice(0,8));
+          setMessage(live.length ? 'Choose an address below.' : local.length ? 'Local area suggestions. Confirm the precise point on the map.' : 'No matches. Try a nearby landmark or select a map point.');
         }
-      } catch (e) { if (!controller.signal.aborted) { setMessage(e.message); setFailed(true); } }
+      } catch (e) { if (!controller.signal.aborted) { setMessage((local.length ? 'Showing approximate local areas. ' : '') + e.message); setFailed(true); } }
     }, 250);
     return () => { clearTimeout(timer); controller.abort(); };
   }, [value.address, valid, open, user?._id, attempt]);
@@ -38,9 +45,9 @@ export function AddressSearch({ title, value, onChange }) {
       }} />
     {open && items.length > 0 && <ul id={id + '-options'} role="listbox" aria-label={title + ' suggestions'}>
       {items.map((p, i) => <li id={id + '-option-' + i} key={i} role="option" aria-selected={i === active}
-        onMouseDown={e => e.preventDefault()} onClick={() => choose(p)}>{p.address}</li>)}
+        onMouseDown={e => e.preventDefault()} onClick={() => choose(p)}>{p.address}{p.source === 'local' && <small>Approximate area · confirm on map</small>}</li>)}
     </ul>}
     {failed && open && <button type="button" className="btn" onClick={() => setAttempt(n => n + 1)}>Retry address search</button>}
-    <small role="status">{!user ? 'Sign in for address suggestions, or choose a point on the map.' : valid ? 'Location selected. You can adjust it on the map.' : message || 'Type at least 2 characters. Matching places appear here as you type.'}</small>
+    <small role="status">{valid ? (value.source === 'local' ? 'Approximate area selected. Adjust the actual pickup or destination on the map.' : 'Location selected. You can adjust it on the map.') : message || 'Type at least 2 characters. Matching places appear here as you type.'}</small>
   </div>;
 }

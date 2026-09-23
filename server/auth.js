@@ -28,7 +28,7 @@ const cookie = () => ({
   path: "/",
   maxAge: 7 * 86400000,
 });
-export const publicUser = (u) => ({
+export const publicUser = (u, privateFields = false) => ({
   _id: u._id,
   name: u.name,
   email: u.email,
@@ -37,6 +37,9 @@ export const publicUser = (u) => ({
   shop: u.shop,
   isAdmin: u.isAdmin,
   wishlist: u.wishlist,
+  ...(privateFields ? { city: u.city || '', occupation: u.occupation || '', bio: u.bio || '',
+  bloodGroup: u.bloodGroup || '', emergencyName: u.emergencyName || '',
+  emergencyPhone: u.emergencyPhone || '', emergencyRelation: u.emergencyRelation || '' } : {}),
 });
 export async function newSession(res, user) {
   const token = randomBytes(32).toString("hex");
@@ -48,7 +51,7 @@ export async function newSession(res, user) {
     expiresAt: new Date(Date.now() + 7 * 86400000),
   });
   res.cookie("hc_session", token, cookie());
-  return { user: publicUser(user), csrfToken: session.csrfToken };
+  return { user: publicUser(user, true), csrfToken: session.csrfToken };
 }
 export async function loadSession(req, res, next) {
   const token = req.cookies.hc_session;
@@ -108,7 +111,7 @@ export const auth = Router();
 auth.get("/me", (req, res) =>
   res.json(
     req.user
-      ? { user: publicUser(req.user), csrfToken: req.session.csrfToken }
+      ? { user: publicUser(req.user, true), csrfToken: req.session.csrfToken }
       : { user: null, csrfToken: null },
   ),
 );
@@ -157,11 +160,18 @@ auth.patch("/profile", requireAuth, async (req, res) => {
       name: z.string().trim().min(2).max(80),
       phone,
       address: z.string().trim().max(400),
+      city: z.string().trim().max(100).optional(),
+      occupation: z.string().trim().max(100).optional(),
+      bio: z.string().trim().max(500).optional(),
+      bloodGroup: z.enum(['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
+      emergencyName: z.string().trim().max(80).optional(),
+      emergencyPhone: z.union([z.literal(''), phone]).optional(),
+      emergencyRelation: z.string().trim().max(60).optional(),
     })
     .parse(req.body);
   Object.assign(req.user, data);
   await req.user.save();
-  res.json(publicUser(req.user));
+  res.json(publicUser(req.user, true));
 });
 auth.post("/change-password", limiter, requireAuth, async (req, res) => {
   const data = z

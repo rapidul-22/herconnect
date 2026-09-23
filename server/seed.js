@@ -12,7 +12,7 @@ export async function seedDemo(password) {
     const user = await User.findOneAndUpdate(
       { email: data.email },
       { $setOnInsert: { ...data, passwordHash, phone: "01712345678" } },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
     );
     shops.push(user);
   }
@@ -33,7 +33,7 @@ export async function seedDemo(password) {
             address: "House 12, Road 5, Dhanmondi, Dhaka",
           },
         },
-        { upsert: true, new: true, setDefaultsOnInsert: true },
+        { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
       ),
     );
   }
@@ -50,7 +50,7 @@ export async function seedDemo(password) {
           createdAt: new Date(Date.now() - i * 3600000),
         },
       },
-      { upsert: true, new: true },
+      { upsert: true, returnDocument: "after" },
     );
     for (let j = 0; j < 3; j++) {
       const demoKey = `review-${key}-${j}`;
@@ -90,7 +90,7 @@ export async function seedDemo(password) {
             demoKey,
           },
         },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: "after" },
       );
       await Review.updateOne(
         { buyer: buyers[j]._id, order: order._id, product: product._id },
@@ -107,7 +107,7 @@ export async function seedDemo(password) {
     }
   }
   console.log(
-    "Demo seed ready: 4 fictional shops, 10 products, 3 buyer accounts and 30 labelled reviews. Existing records were not overwritten.",
+    "Demo seed ready: 6 fictional shops, 30 products, 3 buyer accounts and 90 labelled reviews. Existing records were not overwritten.",
   );
 }
 if (

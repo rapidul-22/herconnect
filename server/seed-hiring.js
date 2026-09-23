@@ -57,6 +57,7 @@ const samples = [
     "I help with room organization, laundry folding and routine home cleaning. I prefer a clear task list so we can agree what fits the requested time. Supplies and special requirements can be discussed in advance.",
   ],
 ];
+samples.push(...[["Ariana Rahman", "Gulshan, Dhaka", "Software Engineering", 5, 1200, "Web applications, API integrations and practical debugging sessions."], ["Nabila Karim", "Banani, Dhaka", "Data Analysis", 4, 1000, "Spreadsheet analysis, SQL queries and clear dashboard reports."], ["Samia Haque", "Dhanmondi, Dhaka", "Marketing", 6, 900, "Campaign planning, audience research and small-business social media."], ["Tahmina Akter", "Sylhet", "Graphic Design", 4, 800, "Visual identities, social graphics and presentation layouts."], ["Raisa Islam", "Uttara, Dhaka", "Content Writing", 3, 650, "Clear website copy, product descriptions and editorial outlines."], ["Zarin Ahmed", "Chattogram", "Tutoring", 7, 600, "Structured study sessions in mathematics and introductory programming."], ["Maliha Sultana", "Rajshahi", "Photography", 5, 1500, "Portrait planning and product-photography sessions."], ["Anika Noor", "Khulna", "Accounting", 6, 1100, "Bookkeeping reviews and small-business spreadsheet organization."], ["Nusrat Binte", "Dhaka", "Career Coaching", 8, 1300, "CV reviews, interview practice and career-planning sessions."], ["Sadika Islam", "Cumilla", "Translation", 4, 700, "Bangla-English translation and proofreading."], ["Farzana Ali", "Barishal", "Event Planning", 7, 950, "Event checklists, vendor coordination and schedule planning."], ["Lamisa Chowdhury", "Mirpur, Dhaka", "Beauty & Styling", 5, 750, "Event styling consultation and personal grooming sessions."], ["Meher Afroz", "Bashundhara, Dhaka", "Software Engineering", 3, 1000, "React interfaces, accessibility reviews and website maintenance."], ["Sumaiya Alam", "Rangpur", "Data Analysis", 2, 700, "Data cleaning and beginner-friendly analytics coaching."]].map(([name,area,skill,years,rate,detail])=>[name,area,[skill],years,rate,detail+' Fictional professional profile for classroom testing. Discuss scope and deliverables before booking.']));
 try {
   if (!process.env.MONGODB_URI) throw new Error("Set MONGODB_URI in .env.");
   const password = process.env.DEMO_PASSWORD;
@@ -180,10 +181,10 @@ try {
     }
   }
   console.log(
-    "Hiring demo ready: 6 fictional worker profiles, 12 completed bookings, 11 labelled reviews. Existing records and passwords were not overwritten.",
+    "Hiring demo ready: 20 fictional service profiles, 40 completed bookings and labelled reviews. Existing records and passwords were not overwritten.",
   );
   console.log(
-    "Accounts: hiringbuyer@herconnect.demo and worker1@herconnect.demo through worker6@herconnect.demo. Use the DEMO_PASSWORD from their first seed.",
+    "Accounts: hiringbuyer@herconnect.demo and worker1@herconnect.demo through worker20@herconnect.demo. Use the DEMO_PASSWORD from their first seed.",
   );
 } catch (e) {
   console.error(

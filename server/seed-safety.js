@@ -25,7 +25,7 @@ try {
   await initSafetyModels();
   const email = "safetyreporter@herconnect.demo";
   let user = await User.findOne({ email });
-  if (user && (!user.isDemo || user.isAdmin))
+  if (user && (user.isAdmin || (!user.isDemo && !(await SafetyReport.exists({reporter:user._id,isDemo:true})))))
     throw new Error(
       "Reserved demo email belongs to a non-demo or moderator account.",
     );
@@ -42,11 +42,13 @@ try {
     [23.804, 90.365, "Mirpur demo area"],
     [24.36, 88.6, "Rajshahi demo area"],
     [22.36, 91.8, "Chattogram demo area"],
+    [24.895, 91.869, "Sylhet demo area"],
+    [22.845, 89.54, "Khulna demo area"],
   ];
-  for (let i = 0; i < 10; i++) {
-    const c = centres[i < 4 ? 0 : i < 8 ? 1 : i - 6],
+  for (let i = 0; i < 36; i++) {
+    const c = centres[Math.floor(i / 6)],
       location = { lat: c[0] + (i % 4) * 0.0005, lng: c[1], address: c[2] },
-      key = "safety-demo-report-" + i;
+      key = "hub-demo-report-" + i;
     await SafetyReport.updateOne(
       { reporter: user._id, requestKey: key },
       {
@@ -55,9 +57,11 @@ try {
           requestKey: key,
           category: reportCategories[i % reportCategories.length],
           description:
-            "Fictional classroom example: a concern was reported near a public walkway. This is sample content for testing the platform, not a real incident.",
+            `Fictional ${reportCategories[i % reportCategories.length].toLowerCase()} scenario near ${c[2]}. A community member reported a concern around a public walkway ${i % 2 ? "in the evening" : "during the day"}. No actual person or event is depicted; this record is for interface and risk-map testing only.`,
           location,
-          occurredAt: new Date(Date.now() - (i + 1) * 86400000),
+          occurredAt: new Date(Date.now() - ([0, 12, 40, 95, 2, 70][Math.floor(i / 6)] + i % 6 + 1) * 86400000 - (i % 3) * 3600000),
+          personDetails: 'Fictional description only: person in a dark jacket; identity unknown. No real person is accused.',
+          witnessNotes: 'Demo context: another fictional passerby was present. No real contact details stored.',
           isAnonymous: i % 3 !== 0,
           status: "pending",
           isDemo: true,
@@ -117,7 +121,7 @@ try {
       { upsert: true },
     );
   console.log(
-    "Safety seed ready: 10 fictional reports, 5 fictional resources and the sourced national emergency entry. Existing records/passwords were not overwritten.",
+    "Safety seed ready: 36 additional fictional reports across 6 areas, 5 fictional resources and the sourced national emergency entry. Existing records/passwords were not overwritten.",
   );
   console.log(
     "Demo login: safetyreporter@herconnect.demo — use the DEMO_PASSWORD chosen when this account was first seeded.",

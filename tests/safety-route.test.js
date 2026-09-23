@@ -25,7 +25,7 @@ test("actual report routes: creation stores actor, duplicate retries, anonymous 
     res.status(e.status || 500).json({ error: e.message }),
   );
   let stored = null;
-  const chain = (value) => ({ populate: () => ({ lean: async () => value }) });
+  const chain = (value) => ({ select: () => ({ populate: () => ({ lean: async () => value }) }) });
   t.mock.method(SafetyReport, "findOne", () => chain(stored));
   t.mock.method(SafetyReport, "create", async (data) => {
     assert.equal(data.reporter, user._id);

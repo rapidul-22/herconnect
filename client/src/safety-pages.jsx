@@ -148,7 +148,7 @@ function ReportCard({ r }) {
 export function SafetyFeed() {
   const [category, setCategory] = useState(""),
     [area, setArea] = useState(""),
-    [demo, setDemo] = useState(false),
+    [demo, setDemo] = useState(true),
     [page, setPage] = useState(1);
   const qs = new URLSearchParams({
       page,
@@ -330,6 +330,7 @@ export function SafetyNew() {
           save.mutate({
             category: d.category,
             description: d.description,
+            personDetails: d.personDetails, witnessNotes: d.witnessNotes,
             location: { ...point, address: d.address },
             occurredAt: new Date(d.occurredAt + ":00+06:00").toISOString(),
             isAnonymous: anonymous,
@@ -425,7 +426,11 @@ export function SafetyNew() {
           </label>
         </div>
         <div className="safety-panel">
-          <h2>3. Your privacy</h2>
+          <h2>3. Private supporting details</h2>
+          <p>Only you and moderators can see these details. Describe what you observed; a report is an allegation, not a finding of guilt. You can attach up to three photos after submitting.</p>
+          <Field label="Person involved: name if known, appearance, clothing, vehicle, relationship" name="personDetails" as="textarea" maxLength={1500} rows={4} />
+          <Field label="Witnesses and additional context (private)" name="witnessNotes" as="textarea" maxLength={1000} rows={3} />
+          <h2>4. Your privacy</h2>
           <label className="safety-check">
             <input
               type="checkbox"
@@ -583,6 +588,10 @@ export function SafetyDetail() {
               <aside>
                 {q.data.history && (
                   <div className="safety-panel">
+                    <h2>Private supporting details</h2>
+                    <p className="safety-prose">{q.data.personDetails || 'No person details provided.'}</p>
+                    <p className="safety-prose">{q.data.witnessNotes}</p>
+                    <EvidencePanel report={q.data} onDone={() => q.refetch()} canEdit={String(q.data.reporter?._id || q.data.reporter) === String(user?._id)} />
                     <h2>Private updates</h2>
                     {user?.isAdmin && (
                       <p>
@@ -618,7 +627,7 @@ export function SafetyDetail() {
   );
 }
 export function SafetyZones() {
-  const [demo, setDemo] = useState(false),
+  const [demo, setDemo] = useState(true),
     q = useSafety(["zones", demo], "/zones/unsafe?demo=" + demo);
   return (
     <>
@@ -658,11 +667,13 @@ export function SafetyZones() {
                 Results use only the latest 2,000 eligible reports.
               </p>
             )}
+            <p className="zone-legend"><strong>Red:</strong> high report activity (score ≥10) · <strong>Amber:</strong> elevated (≥5) · <strong>Purple:</strong> cluster. Approximate 500 m circles, not verified unsafe boundaries.</p>
+            <details><summary>How the score works</summary><p>Assault 5, stalking 4, harassment 3, verbal abuse and unsafe-area concerns 2, other 1. Reports from the last 7 days receive full weight; 8–30 days 60%, 31–90 days 30%, 91–180 days 10%. At least three nearby reports are needed. Duplicate or false reports can bias these indicators. Demo reports are always separate.</p></details>
             <SafetyMap points={q.data.zones} />
             <div className="safety-grid">
               {q.data.zones.map((z) => (
                 <article className="safety-card" key={z.id}>
-                  <h2>Report cluster {z.id}</h2>
+                  <h2>{z.level || "Report cluster"} · {z.id}</h2><p>Weighted score: {z.score} · latest report {at(z.latestAt)}</p>
                   <p>
                     {z.count} reports · near {z.lat}, {z.lng}
                   </p>
@@ -794,7 +805,7 @@ export function SafetyResources() {
   const { user } = useApp(),
     [type, setType] = useState(""),
     [term, setTerm] = useState(""),
-    [demo, setDemo] = useState(false),
+    [demo, setDemo] = useState(true),
     [near, setNear] = useState(null),
     [editing, setEditing] = useState(undefined);
   const qs = new URLSearchParams({
@@ -973,7 +984,7 @@ export function SafetyResources() {
 }
 export function SafetyAdmin() {
   const [status, setStatus] = useState(""),
-    [demo, setDemo] = useState(false),
+    [demo, setDemo] = useState(true),
     [page, setPage] = useState(1),
     qs = new URLSearchParams({ demo, page, ...(status ? { status } : {}) }),
     q = useSafety(["admin", qs.toString()], "/reports/admin?" + qs);
@@ -1025,4 +1036,22 @@ export function SafetyAdmin() {
       </QueryState>
     </>
   );
+}
+
+function EvidencePanel({report,onDone,canEdit}) {
+  const [error,setError]=useState(''), [busy,setBusy]=useState(false);
+  async function upload(e) {
+    e.preventDefault(); setBusy(true); setError('');
+    const form=e.currentTarget;
+    try { await api('/reports/'+report._id+'/evidence',{method:'POST',body:new FormData(form)}); form.reset(); await onDone(); }
+    catch(e){setError(e.message);} finally{setBusy(false);}
+  }
+  return <section><h3>Private photo evidence</h3><p>Visible only to you and moderators. Image metadata is removed. Do not upload intimate images or unrelated personal documents.</p>
+    <div className="evidence-grid">{(report.evidence || []).map(p=><figure key={p._id}>
+      <img src={'/api/reports/'+report._id+'/evidence/'+p._id} alt="Private supporting evidence" />
+      {canEdit && <button className="btn" type="button" onClick={async()=>{try{await api('/reports/'+report._id+'/evidence/'+p._id,{method:'DELETE'});await onDone();}catch(e){setError(e.message);}}}>Remove photo</button>}
+    </figure>)}</div>
+    {canEdit && (report.evidence || []).length<3 && <form onSubmit={upload}><label>Attach evidence (JPEG, PNG, WebP; max 5 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp" required /></label><button className="btn primary" disabled={busy}>{busy?'Uploading…':'Upload private photo'}</button></form>}
+    {error && <p role="alert">{error}</p>}
+  </section>;
 }

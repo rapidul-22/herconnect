@@ -4,7 +4,7 @@ import { useApp } from './shared.jsx';
 import './dashboard.css';
 const modules = [
   { name: 'Marketplace', tag: 'DISCOVER & CREATE', text: 'Find something you love. Support a small business. Build a shop of your own.', path: '/marketplace', icon: ShoppingBag, tone: 'rose', actions: [['My orders', '/orders'], ['My shop', '/seller']] },
-  { name: 'Worker hiring', tag: 'A LITTLE HELP, CLOSE BY', text: 'Find help for your home, manage a booking or offer your own skills.', path: '/hiring', icon: HandHeart, tone: 'peach', actions: [['My bookings', '/hiring/bookings'], ['My worker profile', '/hiring/mine']] },
+  { name: 'Services & talent', tag: 'A LITTLE HELP, CLOSE BY', text: 'Discover creative, technical and everyday services, or offer your own expertise.', path: '/hiring', icon: HandHeart, tone: 'peach', actions: [['My bookings', '/hiring/bookings'], ['My service profile', '/hiring/mine']] },
   { name: 'Safety & support', tag: 'A COMMUNITY THAT CARES', text: 'Share a concern, explore area reports and find support when you need it.', path: '/safety', icon: ShieldCheck, tone: 'sage', actions: [['My reports', '/safety/mine'], ['Find support', '/safety/resources']] },
   { name: 'Safe transport', tag: 'YOUR NEXT STOP', text: 'Plan your route, request a ride or apply to drive. Keep your journey in view.', path: '/transport', icon: CarFront, tone: 'lavender', actions: [['My rides', '/transport/rides'], ['My driver profile', '/transport/drive']] },
 ];

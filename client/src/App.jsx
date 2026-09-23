@@ -88,6 +88,7 @@ function Guard({ admin = false }) {
   if (admin && !user.isAdmin) return <Navigate replace to="/dashboard" />;
   return <Outlet />;
 }
+import SOS from './sos.jsx';
 function Layout() {
   const { user, cart } = useApp(),
     [menu, setMenu] = useState(false),
@@ -108,9 +109,10 @@ function Layout() {
   const links = [
     ["/dashboard", LayoutDashboard, "My dashboard"],
     ["/marketplace", ShoppingBag, "Marketplace"],
-    ["/hiring", HandHeart, "Worker hiring"],
+    ["/hiring", HandHeart, "Services & talent"],
     ["/safety", ShieldCheck, "Safety & support"],
     ["/transport", CarFront, "Safe transport"],
+    ["/sos", ShieldCheck, "SOS & trusted contacts"],
     ...(!user?.isAdmin
       ? [
           ["/wishlist", Heart, "Saved favourites"],
@@ -229,6 +231,7 @@ function Layout() {
         </header>
         <main id="main">
           <Outlet />
+          <Link className="sos-float" to="/sos" aria-label="Open SOS and emergency contact tools">SOS · Get help</Link>
         </main>
         <footer>
           <span>
@@ -301,6 +304,7 @@ export default function App() {
               />
             }
           />
+          <Route path="sos" element={<SOS />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="marketplace" element={<Marketplace />} />
           <Route path="transport" element={<TransportHome />} />
