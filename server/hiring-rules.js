@@ -1,13 +1,6 @@
 import { z } from "zod";
-export const skills = [
-  "Cleaning",
-  "Cooking",
-  "Childcare",
-  "Elderly Care",
-  "Gardening",
-  "Driving",
-  "Other",
-];
+import { skills } from '../shared/services.js';
+export { skills };
 export const profileInput = z
   .object({
     displayName: z.string().trim().min(2).max(80),

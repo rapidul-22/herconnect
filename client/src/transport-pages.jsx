@@ -238,7 +238,7 @@ export function TransportHome() {
     [pickup, setPickup] = useState({ address: "", lat: "", lng: "" }),
     [dropoff, setDropoff] = useState({ address: "", lat: "", lng: "" }),
     [target, setTarget] = useState("pickup"),
-    [demo, setDemo] = useState(false),
+    [demo, setDemo] = useState(true),
     [estimate, setEstimate] = useState(null),
     [page, setPage] = useState(1),
     [requestKey, setRequestKey] = useState(() => crypto.randomUUID());
@@ -576,7 +576,7 @@ function DriverEditor({ profile }) {
         label="Vehicle type"
         name="vehicleType"
         as="select"
-        defaultValue={profile?.vehicleType || "Car"}
+        defaultValue={vehicleTypes.includes(profile?.vehicleType) ? profile.vehicleType : "Car"}
       >
         {opts(vehicleTypes)}
       </Field>

@@ -40,6 +40,7 @@ export default function SafetyMap({
     observer.observe(host.current);
     return () => {
       observer.disconnect();
+      m.stop();
       m.remove();
       map.current = null;
     };
@@ -51,6 +52,7 @@ export default function SafetyMap({
     const all = (point ? [{ ...point, label: pointLabel }] : points).filter(
       (p) => Number.isFinite(p.lat) && Number.isFinite(p.lng),
     );
+    all.filter(p => p.radiusMetres).forEach(p => L.circle([p.lat,p.lng], {radius:p.radiusMetres,color:p.color || '#b42342',fillOpacity:.16,weight:2}).addTo(layer.current));
     all
       .filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng))
       .forEach((p) => {
@@ -71,11 +73,11 @@ export default function SafetyMap({
         { color: "#9e749d", dashArray: "6 8", weight: 3 },
       ).addTo(layer.current);
     if (point && Number.isFinite(point.lat) && Number.isFinite(point.lng))
-      m.panTo([point.lat, point.lng]);
+      m.panTo([point.lat, point.lng], { animate: false });
     else if (all.length)
       m.fitBounds(
         [...all.map((p) => [p.lat, p.lng]), ...route.flat()],
-        { padding: [35, 35], maxZoom: 14 },
+        { padding: [35, 35], maxZoom: 14, animate: false },
       );
   }, [point, points, pointLabel, routeLine, route]);
   return (

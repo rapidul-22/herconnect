@@ -33,15 +33,7 @@ import {
   formData,
 } from "./shared.jsx";
 import "./hiring.css";
-const skills = [
-  "Cleaning",
-  "Cooking",
-  "Childcare",
-  "Elderly Care",
-  "Gardening",
-  "Driving",
-  "Other",
-];
+import { skills } from '../../shared/services.js';
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const minutes = (v) =>
   String(Math.floor(v / 60)).padStart(2, "0") +
@@ -67,7 +59,7 @@ function HiringNav() {
   const { user } = useApp();
   return (
     <nav className="hiring-nav" aria-label="Hiring navigation">
-      <Link to="/hiring">Find help</Link>
+      <Link to="/hiring">Find a professional</Link>
       {user && !user.isAdmin && (
         <>
           <Link to="/hiring/bookings">My bookings</Link>
@@ -156,7 +148,7 @@ export function HiringDirectory() {
             with a connection.
           </h1>
           <p>
-            Find home-service providers, explore their experience and request a
+            Find women in technology, design, business and home services. Request a
             time that works for you.
           </p>
           <div className="hiring-hero-points">
@@ -233,7 +225,7 @@ export function HiringDirectory() {
         </Field>
         <button className="btn primary" type="submit">
           <Search size={18} />
-          Find help
+          Find a professional
         </button>
       </form>
       <div className="section-heading">

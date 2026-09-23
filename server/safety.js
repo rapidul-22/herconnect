@@ -1,4 +1,6 @@
 import { Router } from "express";
+import multer from 'multer';
+import sharp from 'sharp';
 import { z } from "zod";
 import { rateLimit } from "express-rate-limit";
 import { requireAuth, admin, fail } from "./auth.js";
@@ -17,6 +19,8 @@ const lat = z.number().min(20).max(27),
 export const reportInput = z.object({
   category: z.enum(reportCategories),
   description: z.string().trim().min(20).max(2000),
+  personDetails: z.string().trim().max(1500).default(''),
+  witnessNotes: z.string().trim().max(1000).default(''),
   location: z.object({ address: z.string().trim().min(3).max(160), lat, lng }),
   occurredAt: z.iso
     .datetime({ offset: true })
@@ -86,6 +90,8 @@ export function reportView(r, privateView = false) {
       reporter: r.reporter,
       hidden: r.hidden,
       history: r.history,
+      personDetails: r.personDetails || '', witnessNotes: r.witnessNotes || '',
+      evidence: (r.evidence || []).map(e => ({ _id: e._id, uploadedAt: e.uploadedAt })),
     });
   return base;
 }
@@ -104,7 +110,7 @@ async function list(req, res, mode) {
       .sort({ createdAt: -1, _id: -1 })
       .skip((q.page - 1) * 12)
       .limit(12)
-      .populate(populate)
+      .select("-evidence.data").populate(populate)
       .lean(),
     SafetyReport.countDocuments(filter),
   ]);
@@ -132,7 +138,7 @@ const submitLimit = rateLimit({
 safety.post("/reports", requireAuth, submitLimit, async (req, res) => {
   const data = reportInput.parse(req.body),
     key = { reporter: req.user._id, requestKey: data.requestKey };
-  let row = await SafetyReport.findOne(key).populate(populate).lean();
+  let row = await SafetyReport.findOne(key).select("-evidence.data").populate(populate).lean();
   if (row) return res.json(reportView(row, true));
   try {
     const created = await SafetyReport.create({
@@ -148,17 +154,17 @@ safety.post("/reports", requireAuth, submitLimit, async (req, res) => {
         },
       ],
     });
-    row = await SafetyReport.findById(created._id).populate(populate).lean();
+    row = await SafetyReport.findById(created._id).select("-evidence.data").populate(populate).lean();
   } catch (e) {
     if (e.code !== 11000) throw e;
-    row = await SafetyReport.findOne(key).populate(populate).lean();
+    row = await SafetyReport.findOne(key).select("-evidence.data").populate(populate).lean();
     return res.json(reportView(row, true));
   }
   res.status(201).json(reportView(row, true));
 });
 safety.get("/reports/:id", async (req, res) => {
   const row = await SafetyReport.findById(id.parse(req.params.id))
-    .populate(populate)
+    .select("-evidence.data").populate(populate)
     .lean();
   const privateView = !!(
     row &&
@@ -200,7 +206,7 @@ safety.patch("/reports/:id/status", requireAuth, admin, async (req, res) => {
     },
     { returnDocument: "after" },
   )
-    .populate(populate)
+    .select("-evidence.data").populate(populate)
     .lean();
   if (!updated)
     fail(
@@ -296,4 +302,34 @@ safety.delete("/resources/:id", requireAuth, admin, async (req, res) => {
   if (!(await HelpResource.findByIdAndDelete(id.parse(req.params.id))))
     fail(404, "Resource not found.");
   res.json({ ok: true });
+});
+
+const evidenceUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024, files: 1 } });
+safety.post('/reports/:id/evidence', requireAuth, submitLimit, async (req, res, next) => {
+  const report = await SafetyReport.findOne({ _id: id.parse(req.params.id), reporter: req.user._id }).select('_id');
+  if (!report) fail(404, 'Report not found.');
+  next();
+}, evidenceUpload.single('image'), async (req, res) => {
+  if (!req.file || !['image/jpeg','image/png','image/webp'].includes(req.file.mimetype)) fail(400, 'Choose a JPEG, PNG or WebP image under 5 MB.');
+  let data;
+  try { data = await sharp(req.file.buffer, { limitInputPixels: 20000000 }).rotate().resize(1400,1400,{fit:'inside',withoutEnlargement:true}).jpeg({quality:80}).toBuffer(); }
+  catch { fail(400, 'The image could not be decoded. Choose another photo.'); }
+  const result = await SafetyReport.updateOne({ _id: req.params.id, reporter: req.user._id, 'evidence.2': { $exists: false } },
+    { $push: { evidence: { data, mime: 'image/jpeg', uploadedAt: new Date() } } });
+  if (!result.modifiedCount) fail(409, 'This report already has three evidence photos.');
+  res.status(201).json({ok:true});
+});
+safety.get('/reports/:id/evidence/:evidenceId', requireAuth, async (req, res) => {
+  const filter = { _id: id.parse(req.params.id) };
+  if (!req.user.isAdmin) filter.reporter = req.user._id;
+  const report = await SafetyReport.findOne(filter).select('+evidence.data');
+  const photo = report?.evidence.id(id.parse(req.params.evidenceId));
+  if (!photo) fail(404, 'Evidence not found.');
+  res.set({'Content-Type':'image/jpeg','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}).send(photo.data);
+});
+safety.delete('/reports/:id/evidence/:evidenceId', requireAuth, async (req, res) => {
+  const result = await SafetyReport.updateOne({ _id: id.parse(req.params.id), reporter:req.user._id },
+    { $pull: { evidence: { _id:id.parse(req.params.evidenceId) } } });
+  if (!result.modifiedCount) fail(404, 'Evidence not found.');
+  res.json({ok:true});
 });

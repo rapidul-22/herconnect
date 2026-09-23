@@ -1,0 +1,35 @@
+
+:root{--berry:#893d68;--berry-dark:#612446;--rose:#f6e5ee;--ink:#342638;--muted:#6b5b6c;--border:#e8dce7;--cream:#fffaf7}
+body{background:radial-gradient(ellipse at 90% 0,#f1e5f5 0,transparent 45%),radial-gradient(ellipse at 0 80%,#fbe6df 0,transparent 45%),#fffaf7;background-attachment:fixed}
+.sidebar{background:linear-gradient(165deg,#fffdfb,#f5eaf2);border-right:1px solid #e7d5e3}
+.sidebar nav a{border-radius:14px;margin-bottom:5px;transition:background .18s,transform .18s}
+.sidebar nav a.active{background:linear-gradient(115deg,#84385f,#aa668d);color:#fff;box-shadow:0 6px 16px #803a6722}
+.topbar{background:#fffcf8ed;backdrop-filter:blur(12px);border-bottom:1px solid #eadce5}
+.btn{border-radius:13px;min-height:42px;transition:transform .16s,box-shadow .16s;gap:8px}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 18px #60304e18}
+.btn.primary{background:linear-gradient(115deg,#863960,#9d5687);color:#fff;border-color:transparent}
+input:not([type=checkbox]):not([type=radio]),select,textarea{border-color:#dacbd9;background:#fffdfd;border-radius:12px;max-width:100%}
+:focus-visible{outline:3px solid #754591;outline-offset:3px}
+.panel,.safety-panel,.hiring-panel,.safety-card,.transport-driver,.worker-card,.product-card{border:1px solid #e9dce6;border-radius:22px;box-shadow:0 8px 30px #64395809;background:#fffdfb}
+.product-card,.worker-card,.safety-card,.transport-driver{transition:transform .2s,box-shadow .2s}
+.product-card:hover,.worker-card:hover,.safety-card:hover,.transport-driver:hover{transform:translateY(-3px);box-shadow:0 12px 26px #64395817}
+.product-card img{border-radius:18px 18px 0 0}
+.page-title{padding-bottom:24px;border-bottom:1px solid #e8dce7;margin-bottom:28px}
+.eyebrow{letter-spacing:.16em;color:#843e70}
+.transport-hero,.hiring-hero,.safety-hero{border:1px solid #e6d3e1;border-radius:28px;background:linear-gradient(120deg,#f8e0e9,#eee5f8 66%,#edf3eb);position:relative;overflow:hidden}
+.hiring-nav,.safety-nav,.transport-nav{gap:8px;padding:10px;background:#fffaf9;border:1px solid #e7d9e4;border-radius:18px;flex-wrap:wrap}
+.hiring-nav a,.safety-nav a,.transport-nav a{border-radius:10px;padding:9px 12px}
+.hiring-nav a:hover,.safety-nav a:hover,.transport-nav a:hover{background:#f2e1ed}
+.status,.verified{border-radius:999px}
+.sos-float{position:fixed;right:22px;bottom:22px;z-index:900;background:#8c284a;color:white;padding:13px 19px;border-radius:99px;box-shadow:0 5px 25px #61244635;font-weight:700;border:2px solid white}
+.sos-layout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;padding-bottom:75px}
+.sos-layout .btn{margin:5px 8px 8px 0}.sos-layout textarea{width:100%;padding:12px;margin:10px 0}
+.sos-primary{background:linear-gradient(125deg,#fce6eb,#f2e8fa)}
+.evidence-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}.evidence-grid figure{margin:0}.evidence-grid img{max-height:220px;border-radius:12px}
+.zone-legend{padding:15px;background:#f9eff2;border-radius:12px}
+.auth-page{background:linear-gradient(120deg,#fff5f0,#f2e6f3)}
+main{padding-bottom:85px!important}
+@media(max-width:700px){.sos-layout{grid-template-columns:1fr}.sos-float{right:12px;bottom:12px;padding:11px 16px}.safety-panel,.panel{border-radius:17px}.page-title h1{font-size:36px}.transport-hero,.hiring-hero,.safety-hero{border-radius:20px}}
+@media(prefers-reduced-motion:reduce){.btn,.sidebar nav a,.product-card,.worker-card,.safety-card,.transport-driver{transition:none;transform:none!important}}
+
+.sos-layout label{display:block;margin-top:12px}

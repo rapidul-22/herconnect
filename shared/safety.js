@@ -63,7 +63,17 @@ export function clusterReports(reports, now = Date.now()) {
     }
     clusters.push(members);
   }
+  const weight = {Assault:5, Stalking:4, Harassment:3, 'Verbal Abuse':2, 'Unsafe Area':2, Other:1};
+  const score = ids => Math.round(ids.reduce((n,j) => {
+    const age = (now - +new Date(rows[j].occurredAt)) / 86400000;
+    return n + (weight[rows[j].category] || 1) * (age <= 7 ? 1 : age <= 30 ? .6 : age <= 90 ? .3 : .1);
+  }, 0) * 10) / 10;
   return clusters.map((ids, i) => ({
+    score: score(ids),
+    level: score(ids) >= 10 ? 'High report activity' : score(ids) >= 5 ? 'Elevated report activity' : 'Report cluster',
+    color: score(ids) >= 10 ? '#b42342' : score(ids) >= 5 ? '#bb6b16' : '#876196',
+    latestAt: new Date(Math.max(...ids.map(j => +new Date(rows[j].occurredAt)))).toISOString(),
+    radiusMetres: 500,
     id: i + 1,
     count: ids.length,
     lat: Number(

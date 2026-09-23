@@ -10,6 +10,7 @@ import "@fontsource/cormorant-garamond/500.css";
 import "@fontsource/cormorant-garamond/600.css";
 import App from "./App.jsx";
 import "./styles.css";
+import "./hub.css";
 const client = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 15000, refetchOnWindowFocus: true },
