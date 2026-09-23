@@ -69,10 +69,7 @@ export function AuthPage({ mode }) {
       }
       query.removeQueries({ predicate: (q) => q.queryKey[0] !== "session" });
       query.setQueryData(["session"], data);
-      const next = params.get("next");
-      navigate(
-        next?.startsWith("/") && !next.startsWith("//") ? next : "/dashboard",
-      );
+      navigate("/dashboard", { replace: true });
     },
     mode === "reset"
       ? "Password updated. Sign in with your new password."
@@ -121,7 +118,7 @@ export function AuthPage({ mode }) {
         <small>Made for women. Open to possibilities.</small>
       </section>
       <main id="main" className="auth-form-side">
-        <Link to="/marketplace" className="back-link">
+        <Link to="/dashboard" className="back-link">
           <ArrowLeft size={16} />
           Back to explore
         </Link>
@@ -131,6 +128,7 @@ export function AuthPage({ mode }) {
           </div>
           <h2>{title}</h2>
           <p>{description}</p>
+          <p className="small-copy">One account for shopping, hiring, safety and transport. No separate module signups.</p>
           {message ? (
             <div className="notice">
               <Check size={22} />
@@ -265,6 +263,7 @@ export function Profile() {
         title="A little about you."
         description="Keep your details up to date for a smoother experience."
       />
+      <div className="notice"><div><h2>Your account works everywhere</h2><p>Use this login across all four modules. Apply for service profiles without creating another account.</p><p><Link to="/seller">My shop</Link> · <Link to="/hiring/mine">My worker profile</Link> · <Link to="/transport/drive">My driver profile</Link> · <Link to="/safety/mine">My safety reports</Link></p></div></div>
       <div className="profile-grid">
         <form
           className="panel form-panel"
@@ -304,6 +303,18 @@ export function Profile() {
             defaultValue={user.address}
             maxLength={400}
           />
+          <Field label="City / area" name="city" defaultValue={user.city || ''} maxLength={100} />
+          <Field label="Occupation or area of study" name="occupation" defaultValue={user.occupation || ''} maxLength={100} />
+          <Field label="About me" name="bio" as="textarea" defaultValue={user.bio || ''} maxLength={500} />
+          <h3>Your private safety details</h3>
+          <p>Optional and visible only in your own account. Blood group is self-reported, not medically verified. Save a trusted contact who has agreed to be contacted.</p>
+          <Field label="Blood group (optional)" name="bloodGroup" as="select" defaultValue={user.bloodGroup || ''}>
+            {['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(v => <option key={v} value={v}>{v || 'Prefer not to say / unknown'}</option>)}
+          </Field>
+          <Field label="Emergency contact name" name="emergencyName" defaultValue={user.emergencyName || ''} maxLength={80} />
+          <Field label="Emergency contact mobile" name="emergencyPhone" defaultValue={user.emergencyPhone || ''} pattern="01[3-9][0-9]{8}" placeholder="01XXXXXXXXX" />
+          <Field label="Relationship" name="emergencyRelation" defaultValue={user.emergencyRelation || ''} maxLength={60} />
+          <Link className="btn" to="/sos">Open SOS tools</Link>
           <Submit pending={update.isPending}>Save changes</Submit>
         </form>
         <form
@@ -343,6 +354,7 @@ export function InfoPage({ type }) {
     help: {
       title: "A little help, right here.",
       items: [
+        ["One account, four modules", "A regular member uses one login to buy or sell, hire or offer services, submit safety reports, and ride or apply to drive. Shop, worker and driver applications still require approval. Moderator accounts remain dedicated to administration."],
         [
           "How do I place an order?",
           "Add products from different shops to your bag. Use each shop’s checkout button to place a separate order with your delivery details. Delivery costs BDT 60 per shop order. Orders use cash on delivery. This course prototype does not dispatch a real courier.",
@@ -361,7 +373,7 @@ export function InfoPage({ type }) {
         ],
         [
           "Are transport and safety services available?",
-          "Not yet. Those modules are planned. HerConnect+ currently provides the marketplace only and does not offer emergency response.",
+          "All four modules are implemented: Marketplace, Worker Hiring, Safety Reporting and Safe Transport. Transport is a classroom ride-request prototype with location updates. Reports and panic alerts do not automatically contact emergency responders.",
         ],
         [
           "I forgot my password.",
@@ -374,11 +386,11 @@ export function InfoPage({ type }) {
       items: [
         [
           "Information we store",
-          "Your name, email, password hash, mobile number, delivery address, saved products, shop details, orders and reviews. Session tokens are stored hashed.",
+          "Your name, email, password hash, mobile number, delivery address, saved products, shop details, orders and reviews. Hiring stores profiles, schedules, bookings and complaints. Safety reports store your account reference, description, incident time, location and moderation history. Transport stores driver applications, private licence numbers, ride locations/status, location timestamps, panic alerts and your optional emergency contact. Optional city, occupation, bio, blood group and emergency contact are stored in your account. Private report details and up to three evidence photos are stored for reporter/moderator access. Photo metadata is stripped. SOS location snapshots are prepared in your browser and shared only through actions you choose. Session tokens are stored hashed.",
         ],
         [
           "Who can see what?",
-          "Approved shop details, products and review display names are public. Only you and the seller handling your order can access its delivery details through the app. Moderators review seller applications.",
+          "Approved shop and worker profiles, products, reviews and visible safety reports are public. Safety descriptions and area labels are public; public coordinates are approximate. Hiding your name hides account identity from public report responses, not from moderators or the database. Do not put identifying details in public text. Exact incident coordinates and report review notes are available only to the reporter and moderators. Delivery and booking contact details have separate participant access controls. Transport ride details are private to its participants; driver location is shown during accepted/ongoing rides. Moderators can inspect driver applications and panic alerts. Your saved emergency contact is shown only to you.",
         ],
         [
           "Images and sample content",
@@ -386,7 +398,7 @@ export function InfoPage({ type }) {
         ],
         [
           "Cookies and local storage",
-          "A required HTTP-only cookie keeps you signed in. Your bag is saved on the current device per account. No advertising trackers are included.",
+          "A required HTTP-only cookie keeps you signed in. Your bag is saved on the current device per account. No advertising trackers are included. Maps load tiles directly from OpenStreetMap, which receives your browser network information and the viewed map area. Device location is requested only when you choose a location-sharing control. Signed-in address searches and selected ride coordinates are sent through our server to Geoapify for suggestions and road routes. Provider data quality and availability vary.",
         ],
         [
           "Deletion and support",
@@ -399,7 +411,7 @@ export function InfoPage({ type }) {
       items: [
         [
           "Educational prototype",
-          "HerConnect+ Release 1 demonstrates women-focused commerce for a university project. Sample products, seller identities and sample reviews are fictional.",
+          "HerConnect+ Release 4 demonstrates Marketplace, Worker Hiring, Safety Reporting and Safe Transport for a university project. Labelled demo products, identities, reviews, incidents and facilities are fictional.",
         ],
         [
           "Purchases and delivery",
@@ -415,7 +427,7 @@ export function InfoPage({ type }) {
         ],
         [
           "Other services",
-          "Safe transport, safety reporting and domestic worker hiring are not available in this release.",
+          "All four modules are implemented as a classroom prototype. Reports are community submissions, not verified allegations; review status does not imply police action. Hotspots never guarantee safety. New Transport fares use provider road distance and classroom rates. Travel times are not live traffic predictions. CNG uses a car-route approximation and rickshaw uses bicycle routing; local restrictions may differ. Older/demo rides retain their original straight-line estimates. Driver approval is not a background check. Panic alerts are recorded in the app without automatic SMS, calls or police dispatch.",
         ],
       ],
     },

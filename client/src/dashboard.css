@@ -1,0 +1,23 @@
+.central-home { --ink: #503149; --muted: #765c71; }
+.central-hero { display:grid;grid-template-columns:1.4fr 1fr;align-items:center;gap:24px;overflow:hidden;padding:44px;border-radius:30px;border:1px solid #ecdae5;background:radial-gradient(ellipse at 80% 15%,#ece4fa 0,transparent 58%),linear-gradient(125deg,#fff7f5,#f4e9f0); }
+.central-intro .eyebrow { display:flex;align-items:center;gap:8px; }
+.central-greeting { margin:24px 0 8px;color:var(--muted); }
+.central-intro h1 { font-size:clamp(36px,4.3vw,64px);line-height:1.05;margin:0 0 18px;color:var(--ink);letter-spacing:-1.5px; }
+.central-intro h1 em { color:#995b82;font-weight:500; }
+.central-intro > p { line-height:1.8; }
+.central-intro .btn { margin-top:10px; }
+.central-art { position:relative;width:280px;height:290px;justify-self:center; }
+.central-ring { position:absolute;inset:22px 6px;border:1px solid #d7bed5;border-radius:50%;transform:rotate(-25deg);box-shadow:0 0 0 20px #ffffff35,0 0 0 42px #ffffff25; }
+.central-flower { position:absolute;inset:75px 70px;display:grid;place-items:center;background:#fff9;border-radius:50%;color:#995b82;box-shadow:0 15px 40px #80566d14; }
+.central-orbit { display:grid;place-items:center;position:absolute;width:66px;height:66px;border:1px solid #ffffff;border-radius:23px;box-shadow:0 10px 24px #50314910; }
+.orbit-0 { top:0;left:48px;background:#f3d8e3;color:#965173; }.orbit-1 { top:80px;right:0;background:#fbe7d6;color:#9d694b; }.orbit-2 { bottom:16px;right:42px;background:#e3eee6;color:#517f65; }.orbit-3 { bottom:60px;left:0;background:#e7e1f5;color:#756195; }
+.central-art-note { position:absolute;bottom:-20px;width:100%;text-align:center;color:var(--muted);font-size:13px; }
+.central-heading { display:flex;align-items:end;justify-content:space-between;gap:16px;margin:36px 0 20px;scroll-margin-top:25px; }.central-heading h2 { margin:6px 0 0;font-size:32px; }.central-heading p { color:var(--muted);font-size:14px; }
+.central-modules { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px; }.central-card { border:1px solid #e8dce4;border-radius:24px;background:#fff;overflow:hidden;transition:transform .18s,box-shadow .18s; }.central-card:hover { transform:translateY(-4px);box-shadow:0 14px 32px #63395312; }
+.central-card-main { display:block;padding:26px;text-decoration:none;color:var(--ink);background:linear-gradient(130deg,var(--tint),#fff 95%); }.central-card.rose { --tint:#fae8ee; }.central-card.peach { --tint:#fff0e3; }.central-card.sage { --tint:#eaf3ed; }.central-card.lavender { --tint:#efeafa; }
+.central-card-top { display:flex;align-items:center;justify-content:space-between;margin-bottom:22px; }.central-icon { display:grid;place-items:center;flex-shrink:0;width:54px;height:54px;border-radius:18px;background:#fff9;color:#8d5a7d;border:1px solid #e9dce7; }.central-number { font-size:32px;opacity:.25;font-family:serif; }.central-card h3 { font-size:29px;margin:8px 0; }.central-card p { line-height:1.8;color:var(--muted);margin-bottom:24px; }.central-enter { display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:14px; }.central-card-actions { display:flex;flex-wrap:wrap;gap:10px;padding:14px 24px;border-top:1px solid #eee4ea; }.central-card-actions a { display:flex;align-items:center;gap:7px;font-size:13px;padding:6px 8px;border-radius:9px;background:#faf6f8; }
+.central-account { display:flex;align-items:center;gap:22px;margin:28px 0;padding:26px;border:1px solid #e8dce4;border-radius:24px;background:#faf6f9; }.central-account h2 { font-size:24px;margin:0 0 8px; }.central-account p { font-size:14px;line-height:1.8;color:var(--muted);margin:0; }.central-account .btn { flex-shrink:0; }.central-admin > div { display:flex;flex-wrap:wrap;gap:10px; }
+.central-home a:focus-visible { outline:3px solid #925287;outline-offset:-3px; }
+@media(max-width:1050px) { .central-hero { padding:28px; }.central-art { transform:scale(.8);width:240px; }.central-account { flex-wrap:wrap; } }
+@media(max-width:650px) { .central-hero { grid-template-columns:1fr;padding:26px 22px; }.central-art { display:none; }.central-heading { display:block; }.central-modules { grid-template-columns:1fr; }.central-card-main { padding:22px; }.central-account { padding:22px; }.central-account > .central-icon { display:none; } }
+@media(prefers-reduced-motion:reduce) { .central-card { transition:none; }.central-card:hover { transform:none; } }

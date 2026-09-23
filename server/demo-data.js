@@ -201,3 +201,15 @@ export const demoComments = [
     5,
   ],
 ];
+
+// Additional fictional catalog editions reuse the bundled illustrative product photos.
+demoShops.push(
+ {name:'Tania Noor',email:'tania@herconnect.demo',shop:{name:'Rose & Ritual',city:'Sylhet',story:'Fictional women-led gifting studio: thoughtful home rituals and small-batch gifts.',status:'approved'}},
+ {name:'Nusrat Jahan',email:'nusrat@herconnect.demo',shop:{name:'Everyday Atelier',city:'Rajshahi',story:'Fictional accessories studio for everyday work, study and creative living.',status:'approved'}}
+);
+const originals = demoProducts.slice();
+for(const [edition,label] of ['Gift edit','Studio collection'].entries()) {
+ for(const [i,p] of originals.entries()) demoProducts.push({...p,key:p.key+'-edition-'+edition,
+  shop:(i+4+edition)%demoShops.length,name:p.name+' · '+label,price:p.price+(edition+1)*10000,
+  stock:12+i,description:p.description+' '+label+' is a fictional catalog edition. Photo is illustrative and shared with the original sample.'});
+}

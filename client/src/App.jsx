@@ -1,3 +1,4 @@
+import { Dashboard } from "./dashboard.jsx";
 import { useEffect, useState } from "react";
 import {
   Link,
@@ -53,6 +54,8 @@ import {
 } from "./market-pages.jsx";
 import { Seller, ProductEditor, Admin } from "./seller-pages.jsx";
 import { HiringDirectory, WorkerDetail, WorkerMine, HiringBookings, HiringBookingDetail, HiringComplaints, HiringAdmin } from "./hiring-pages.jsx";
+import { SafetyFeed, SafetyNew, SafetyMine, SafetyDetail, SafetyZones, SafetyResources, SafetyAdmin } from "./safety-pages.jsx";
+import { TransportHome, TransportDriverDetail, TransportDrive, TransportContact, TransportRides, TransportRideDetail, TransportAdmin } from "./transport-pages.jsx";
 export function Logo() {
   return (
     <Link to="/" className="logo">
@@ -85,6 +88,7 @@ function Guard({ admin = false }) {
   if (admin && !user.isAdmin) return <Navigate replace to="/dashboard" />;
   return <Outlet />;
 }
+import SOS from './sos.jsx';
 function Layout() {
   const { user, cart } = useApp(),
     [menu, setMenu] = useState(false),
@@ -105,14 +109,17 @@ function Layout() {
   const links = [
     ["/dashboard", LayoutDashboard, "My dashboard"],
     ["/marketplace", ShoppingBag, "Marketplace"],
-    ["/hiring", HandHeart, "Worker hiring"],
+    ["/hiring", HandHeart, "Services & talent"],
+    ["/safety", ShieldCheck, "Safety & support"],
+    ["/transport", CarFront, "Safe transport"],
+    ["/sos", ShieldCheck, "SOS & trusted contacts"],
     ...(!user?.isAdmin
       ? [
           ["/wishlist", Heart, "Saved favourites"],
           ["/orders", Package, "My orders"],
           ["/seller", Store, "My shop"],
         ]
-      : [["/admin", ShieldCheck, "Shop moderation"], ["/admin/hiring", HandHeart, "Worker moderation"]]),
+      : [["/admin", ShieldCheck, "Shop moderation"], ["/admin/hiring", HandHeart, "Worker moderation"], ["/admin/safety", ShieldCheck, "Safety moderation"], ["/admin/transport", CarFront, "Transport moderation"]]),
   ];
   return (
     <div className="app-layout">
@@ -131,7 +138,6 @@ function Layout() {
             <NavLink end={path === "/marketplace"} key={path} to={path}>
               <Icon size={19} />
               {label}
-              {path === "/marketplace" && <span className="nav-new">NEW</span>}
             </NavLink>
           ))}
         </nav>
@@ -225,6 +231,7 @@ function Layout() {
         </header>
         <main id="main">
           <Outlet />
+          <Link className="sos-float" to="/sos" aria-label="Open SOS and emergency contact tools">SOS · Get help</Link>
         </main>
         <footer>
           <span>
@@ -237,179 +244,6 @@ function Layout() {
           </div>
         </footer>
       </div>
-    </div>
-  );
-}
-function Dashboard() {
-  const { user } = useApp();
-  const products = useQuery({
-    queryKey: ["products", "dashboard"],
-    queryFn: () => api("/products"),
-  });
-  const orders = useQuery({
-    queryKey: ["orders"],
-    queryFn: () => api("/orders"),
-    enabled: !user.isAdmin,
-  });
-  const modules = [
-    {
-      name: "Marketplace",
-      desc: "Discover thoughtful finds from women-led shops.",
-      icon: ShoppingBag,
-      tone: "rose",
-      live: true,
-      path: "/marketplace",
-    },
-    {
-      name: "Safe transport",
-      desc: "A more confident way to get where you need to go.",
-      icon: CarFront,
-      tone: "lavender",
-    },
-    {
-      name: "Safety & support",
-      desc: "A space to report concerns and find help.",
-      icon: ShieldCheck,
-      tone: "sage",
-    },
-    {
-      name: "Worker hiring",
-      desc: "Explore service providers and request help for your home.",
-      live: true,
-      path: "/hiring",
-      icon: HandHeart,
-      tone: "peach",
-    },
-  ];
-  return (
-    <>
-      <PageTitle
-        eyebrow="YOUR HERCONNECT+"
-        title={`Hello, ${user.name.split(" ")[0]}.`}
-        description="Your everyday essentials, brought a little closer."
-      />
-      <section className="dashboard-hero">
-        <div>
-          <span className="eyebrow">A COMMUNITY THAT GROWS WITH YOU</span>
-          <h2>
-            Her ideas.
-            <br />
-            Your next favourite.
-          </h2>
-          <p>
-            Meet independent makers. Find something special.{" "}
-            <br />
-            Make a difference with your everyday choices.
-          </p>
-          <Link className="btn primary" to="/marketplace">
-            Explore the marketplace
-            <ArrowRight size={18} />
-          </Link>
-        </div>
-        <div className="hero-photo">
-          <img src="/images/ceramic.jpg" alt="Handcrafted ceramic cup" />
-          <span className="photo-note">
-            Thoughtfully made.
-            <br />
-            <em>Personally chosen.</em>
-          </span>
-        </div>
-      </section>
-      <div className="section-heading">
-        <h2>Your world, connected</h2>
-        <span>Four services. One space.</span>
-      </div>
-      <div className="module-grid">
-        {modules.map((m, i) => (
-          <Link
-            key={m.name}
-            to={m.live ? m.path : "/coming-soon/" + i}
-            className={"module " + m.tone}
-          >
-            <div className="module-top">
-              <span className="module-icon">
-                <m.icon size={25} />
-              </span>
-              <span className={"status " + (m.live ? "approved" : "pending")}>
-                {m.live ? "Explore now" : "Coming next"}
-              </span>
-            </div>
-            <h3>{m.name}</h3>
-            <p>{m.desc}</p>
-            <ArrowUpRight className="module-arrow" size={19} />
-          </Link>
-        ))}
-      </div>
-      {!user.isAdmin && (
-        <div className="stats-strip">
-          <Link to="/orders">
-            <Package />
-            <span>
-              <strong>
-                {orders.data?.filter(
-                  (o) => !["cancelled", "delivered"].includes(o.status),
-                ).length ?? "—"}
-              </strong>
-              Active orders
-            </span>
-            <ArrowRight />
-          </Link>
-          <Link to="/wishlist">
-            <Heart />
-            <span>
-              <strong>{user.wishlist.length}</strong>Saved favourites
-            </span>
-            <ArrowRight />
-          </Link>
-          <Link to="/seller">
-            <Store />
-            <span>
-              <strong>
-                {user.shop.status === "none"
-                  ? "Your next chapter"
-                  : user.shop.status}
-              </strong>
-              {user.shop.status === "none"
-                ? "Open your own shop"
-                : "Shop application"}
-            </span>
-            <ArrowRight />
-          </Link>
-        </div>
-      )}
-      <div className="section-heading">
-        <h2>A few lovely discoveries</h2>
-        <Link to="/marketplace">
-          View all finds
-          <ArrowRight size={17} />
-        </Link>
-      </div>
-      <QueryState query={products}>
-        {products.data && (
-          <ProductGrid products={products.data.products.slice(0, 4)} />
-        )}
-      </QueryState>
-    </>
-  );
-}
-function ComingSoon() {
-  return (
-    <div className="coming">
-      <Flower2 size={50} />
-      <span className="eyebrow">GROWING, ONE STEP AT A TIME</span>
-      <h1>
-        Something thoughtful
-        <br />
-        is on its way.
-      </h1>
-      <p>
-        Transport and safety reporting are planned for future
-        releases. These services are not available yet.
-      </p>
-      <Link className="btn primary" to="/dashboard">
-        Back to your dashboard
-        <ArrowRight size={18} />
-      </Link>
     </div>
   );
 }
@@ -465,12 +299,20 @@ export default function App() {
             index
             element={
               <Navigate
-                to={session.data.user ? "/dashboard" : "/marketplace"}
+                to="/dashboard"
                 replace
               />
             }
           />
+          <Route path="sos" element={<SOS />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="marketplace" element={<Marketplace />} />
+          <Route path="transport" element={<TransportHome />} />
+          <Route path="transport/drivers/:id" element={<TransportDriverDetail />} />
+          <Route path="safety" element={<SafetyFeed />} />
+          <Route path="safety/zones" element={<SafetyZones />} />
+          <Route path="safety/resources" element={<SafetyResources />} />
+          <Route path="safety/reports/:id" element={<SafetyDetail />} />
           <Route path="hiring" element={<HiringDirectory />} />
           <Route path="hiring/workers/:id" element={<WorkerDetail />} />
           <Route path="marketplace/:id" element={<ProductDetail />} />
@@ -479,8 +321,13 @@ export default function App() {
           <Route path="privacy" element={<InfoPage type="privacy" />} />
           <Route path="terms" element={<InfoPage type="terms" />} />
           <Route element={<Guard />}>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="coming-soon/:module" element={<ComingSoon />} />
+            <Route path="safety/new" element={<SafetyNew />} />
+            <Route path="safety/mine" element={<SafetyMine />} />
+            <Route path="transport/drive" element={<TransportDrive />} />
+            <Route path="transport/contact" element={<TransportContact />} />
+            <Route path="transport/rides" element={<TransportRides />} />
+            <Route path="transport/rides/:id" element={<TransportRideDetail />} />
+            <Route path="coming-soon/:module" element={<Navigate to="/dashboard" replace />} />
             <Route path="profile" element={<Profile />} />
             <Route path="hiring/mine" element={<WorkerMine />} />
             <Route path="hiring/bookings" element={<HiringBookings />} />
@@ -500,6 +347,8 @@ export default function App() {
           </Route>
           <Route element={<Guard admin />}>
             <Route path="admin" element={<Admin />} />
+            <Route path="admin/transport" element={<TransportAdmin />} />
+            <Route path="admin/safety" element={<SafetyAdmin />} />
             <Route path="admin/hiring" element={<HiringAdmin />} />
           </Route>
           <Route

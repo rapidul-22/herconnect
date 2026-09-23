@@ -1,0 +1,1 @@
+export const skills = ['Cleaning', 'Cooking', 'Childcare', 'Elderly Care', 'Gardening', 'Driving', 'Marketing', 'Software Engineering', 'Data Analysis', 'Graphic Design', 'Content Writing', 'Tutoring', 'Photography', 'Accounting', 'Career Coaching', 'Translation', 'Event Planning', 'Beauty & Styling', 'Other'];
