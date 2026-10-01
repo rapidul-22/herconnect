@@ -25,7 +25,7 @@ export function Dashboard() {
         <span className="central-art-note">Built around her.</span>
       </div>
     </section>
-    <div className="central-heading" id="choose-module"><div><span className="eyebrow">FOUR WAYS TO CONNECT</span><h2>Your day. Your choice.</h2></div><p>Explore any module with the same account.</p></div>
+    <div className="central-heading" id="choose-module"><div><span className="eyebrow">FOUR WAYS TO CONNECT</span><h2>Your day. Your choice.</h2></div><p>{user ? "Explore any module with the same account." : "Sign in or join to open a module. One account gives access to all four."}</p></div>
     <section className="central-modules" aria-label="Choose a module">
       {modules.map(({ name, tag, text, path, icon: Icon, tone, actions }, i) => <article key={name} className={'central-card ' + tone}>
         <Link className="central-card-main" to={path} aria-label={'Open ' + name}>
@@ -33,7 +33,7 @@ export function Dashboard() {
           <span className="eyebrow">{tag}</span><h3>{name}</h3><p>{text}</p>
           <span className="central-enter">Explore {name.toLowerCase()} <ArrowUpRight size={20} /></span>
         </Link>
-        {!user?.isAdmin && <div className="central-card-actions">{actions.map(([label, to]) => <Link key={to} to={to}>{label}<ArrowUpRight size={14} /></Link>)}</div>}
+        {user && !user.isAdmin && <div className="central-card-actions">{actions.map(([label, to]) => <Link key={to} to={to}>{label}<ArrowUpRight size={14} /></Link>)}</div>}
       </article>)}
     </section>
     <section className="central-account">

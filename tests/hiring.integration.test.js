@@ -19,7 +19,7 @@ async function account(name) {
     .post("/api/auth/signup")
     .send({
       name,
-      email: name + "@test.example",
+      email: name + "@herconnect.demo",
       password: "LongTestPassword123!",
       phone: "01712345678",
     })
@@ -68,7 +68,7 @@ test("hiring approval, private booking, concurrency, cancellation, completion an
   };
   const profile = (await write(worker, "put", "/mine", data).expect(201)).body;
   assert.equal(profile.status, "pending");
-  assert.equal((await request(app).get("/api/hiring/workers")).body.total, 0);
+  assert.equal((await customer.agent.get("/api/hiring/workers")).body.total, 0);
   await write(customer, "patch", "/admin/workers/" + profile._id, {
     status: "approved",
     reason: "Attempt",
@@ -78,7 +78,7 @@ test("hiring approval, private booking, concurrency, cancellation, completion an
     reason: "Application reviewed",
   }).expect(200);
   const publicProfile = (
-    await request(app)
+    await customer.agent
       .get("/api/hiring/workers/" + profile._id)
       .expect(200)
   ).body;
@@ -239,7 +239,7 @@ const b = bookingResponse.body;
     status: "suspended",
     reason: "Manual moderation decision",
   }).expect(200);
-  await request(app)
+  await customer.agent
     .get("/api/hiring/workers/" + profile._id)
     .expect(404);
   await write(worker, "put", "/mine", data).expect(403);

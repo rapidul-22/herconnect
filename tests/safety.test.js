@@ -106,7 +106,7 @@ test("anonymous projection excludes identity/history, named exposes only display
     false,
   );
 });
-test("report and resource write endpoints require session; malformed public queries rejected before storage", async () => {
+test("report and resource write endpoints require session; guest module queries blocked before storage", async () => {
   for (const path of ["/reports/mine", "/reports/admin"])
     await request(app)
       .get("/api" + path)
@@ -137,5 +137,5 @@ test("report and resource write endpoints require session; malformed public quer
   ])
     await request(app)
       .get("/api" + path)
-      .expect(400);
+      .expect(401);
 });

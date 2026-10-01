@@ -7,7 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync, mkdirSync } from "node:fs";
 import mongoose from "mongoose";
-import { auth, loadSession, fail } from "./auth.js";
+import { auth, loadSession, fail, requireAuth } from "./auth.js";
 import { marketplace } from "./marketplace.js";
 import { hiring } from "./hiring.js";
 import { safety } from "./safety.js";
@@ -69,6 +69,10 @@ app.get("/api/health", (req, res) =>
 );
 app.use("/api", loadSession);
 app.use("/api/auth", auth);
+// Module data requires a session too, not just the React pages.
+app.use(['/api/products', '/api/shops', '/api/wishlist', '/api/seller',
+  '/api/orders', '/api/admin', '/api/hiring', '/api/reports',
+  '/api/zones', '/api/resources', '/api/transport'], requireAuth);
 app.use("/api", marketplace);
 app.use("/api/hiring", hiring);
 app.use("/api", safety);

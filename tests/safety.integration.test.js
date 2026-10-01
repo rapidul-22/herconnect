@@ -16,7 +16,7 @@ async function account(name) {
     .post("/api/auth/signup")
     .send({
       name,
-      email: name + "@test.example",
+      email: name + "@herconnect.demo",
       password: "LongTestPassword123!",
       phone: "01712345678",
     })
@@ -69,7 +69,7 @@ test("report creation, public privacy, owner access, retry, moderation, real/dem
     r._id,
   );
   const publicReport = (
-    await request(app)
+    await other.agent
       .get("/api/reports/" + r._id)
       .expect(200)
   ).body;
@@ -112,14 +112,14 @@ test("report creation, public privacy, owner access, retry, moderation, real/dem
     note: "Removed identifying text from public access.",
     expectedVersion: 2,
   }).expect(200);
-  await request(app)
+  await other.agent
     .get("/api/reports/" + r._id)
     .expect(404);
   await other.agent.get("/api/reports/" + r._id).expect(404);
   await reporter.agent.get("/api/reports/" + r._id).expect(200);
-  assert.equal((await request(app).get("/api/reports")).body.total, 0);
+  assert.equal((await other.agent.get("/api/reports")).body.total, 0);
   assert.equal(
-    (await request(app).get("/api/zones/unsafe")).body.sampleSize,
+    (await other.agent.get("/api/zones/unsafe")).body.sampleSize,
     0,
   );
   assert.equal(
@@ -134,7 +134,7 @@ test("report creation, public privacy, owner access, retry, moderation, real/dem
       isAnonymous: i !== 0,
       location: { ...body.location, lat: 23.812 + i * 0.0002 },
     }).expect(201);
-  const feed = (await request(app).get("/api/reports?area=Test")).body;
+  const feed = (await other.agent.get("/api/reports?area=Test")).body;
   assert.equal(feed.total, 3);
   assert.ok(feed.reports.some((r) => r.reporterName === "Reporter"));
   assert.ok(
@@ -143,7 +143,7 @@ test("report creation, public privacy, owner access, retry, moderation, real/dem
     ),
   );
   assert.equal(
-    (await request(app).get("/api/zones/unsafe")).body.zones[0].count,
+    (await other.agent.get("/api/zones/unsafe")).body.zones[0].count,
     3,
   );
   await SafetyReport.create({
@@ -153,11 +153,11 @@ test("report creation, public privacy, owner access, retry, moderation, real/dem
     isDemo: true,
   });
   assert.equal(
-    (await request(app).get("/api/zones/unsafe")).body.sampleSize,
+    (await other.agent.get("/api/zones/unsafe")).body.sampleSize,
     3,
   );
   assert.equal(
-    (await request(app).get("/api/zones/unsafe?demo=true")).body.sampleSize,
+    (await other.agent.get("/api/zones/unsafe?demo=true")).body.sampleSize,
     1,
   );
   const resource = {
@@ -180,7 +180,7 @@ test("report creation, public privacy, owner access, retry, moderation, real/dem
     await write(moderator, "post", "/resources", resource).expect(201)
   ).body;
   const list = (
-    await request(app).get("/api/resources?lat=23.81&lng=90.41&type=Hospital")
+    await other.agent.get("/api/resources?lat=23.81&lng=90.41&type=Hospital")
   ).body;
   assert.equal(list.resources[0].distanceKm, 0);
   await write(moderator, "put", "/resources/" + entry._id, {
@@ -190,7 +190,7 @@ test("report creation, public privacy, owner access, retry, moderation, real/dem
   await write(other, "delete", "/resources/" + entry._id).expect(403);
   await write(moderator, "delete", "/resources/" + entry._id).expect(200);
   assert.equal(
-    (await request(app).get("/api/resources")).body.resources.length,
+    (await other.agent.get("/api/resources")).body.resources.length,
     0,
   );
 });
@@ -208,7 +208,7 @@ test('private profile fields and photo evidence stay restricted to their intende
  await reporter.agent.post(path+'/evidence').set('X-CSRF-Token',reporter.csrf).attach('image',image,'test.png').expect(409);
  const own=(await reporter.agent.get(path)).body;
  assert.equal(own.evidence.length,3);assert.equal(own.evidence[0].data,undefined);
- const publicView=(await request(app).get(path)).body;assert.equal(publicView.personDetails,undefined);assert.equal(publicView.evidence,undefined);
+ const publicView=(await other.agent.get(path)).body;assert.equal(publicView.personDetails,undefined);assert.equal(publicView.evidence,undefined);
  const url=path+'/evidence/'+own.evidence[0]._id;
  await request(app).get(url).expect(401);await other.agent.get(url).expect(404);
  const photo=await reporter.agent.get(url).expect(200);assert.match(photo.headers['content-type'],/image\/jpeg/);assert.equal(photo.headers['cache-control'],'private, no-store');
@@ -216,4 +216,52 @@ test('private profile fields and photo evidence stay restricted to their intende
  await other.agent.delete(url).set('X-CSRF-Token',other.csrf).expect(404);
  await reporter.agent.delete(url).set('X-CSRF-Token',reporter.csrf).expect(200);
  await reporter.agent.get(url).expect(404);
+});
+
+test('ride-linked evidence belongs to its reporter, not the other ride participant; demo incidents stay demo', async () => {
+  const { TransportRide } = await import('../server/transport-models.js');
+  const ride = await TransportRide.create({ passenger: reporter.user._id, driver: other.user._id,
+    status: 'completed', vehicleType: 'Car', requestKey: randomUUID(), isDemo: true });
+  const body = { category: 'Harassment', description: 'Fictional transport incident at a public landmark.',
+    location: { address: 'Test landmark', lat: 23.8, lng: 90.4 },
+    occurredAt: new Date(Date.now() - 60000).toISOString(), requestKey: randomUUID(), transportRide: String(ride._id), isDemo: false };
+  await write(moderator, 'post', '/reports', body).expect(404);
+  await write(reporter, 'post', '/reports', { ...body, transportRide: 'bad-id' }).expect(400);
+  const created = await write(reporter, 'post', '/reports', body).expect(201);
+  assert.equal(created.body.transportRide, String(ride._id));
+  assert.equal(created.body.isDemo, true);
+  const path = '/api/reports/' + created.body._id;
+  const image = await sharp({ create: { width: 12, height: 12, channels: 3, background: '#ab7899' } }).png().toBuffer();
+  await reporter.agent.post(path + '/evidence').attach('image', image, 'test.png').expect(403);
+  await reporter.agent.post(path + '/evidence').set('X-CSRF-Token', reporter.csrf).field('kind', 'Invalid').attach('image', image, 'test.png').expect(400);
+  await reporter.agent.post(path + '/evidence').set('X-CSRF-Token', reporter.csrf).attach('image', Buffer.alloc(5 * 1024 * 1024 + 1), 'large.png').expect(400);
+  await reporter.agent.post(path + '/evidence').set('X-CSRF-Token', reporter.csrf).field('kind', 'Vehicle').field('caption', 'Private vehicle detail').attach('image', image, 'test.png').expect(201);
+  const own = (await reporter.agent.get(path).expect(200)).body;
+  assert.equal(own.evidence[0].kind, 'Vehicle');
+  assert.equal(own.evidence[0].caption, 'Private vehicle detail');
+  assert.equal(own.evidence[0].data, undefined);
+  const counterpart = (await other.agent.get(path).expect(200)).body;
+  assert.equal(counterpart.transportRide, undefined);
+  assert.equal(counterpart.evidence, undefined);
+  assert.equal((await reporter.agent.get('/api/reports/mine?ride=' + ride._id)).body.total, 1);
+  assert.equal((await other.agent.get('/api/reports/mine?ride=' + ride._id)).body.total, 0);
+  const imagePath = path + '/evidence/' + own.evidence[0]._id;
+  await other.agent.get(imagePath).expect(404);
+  await other.agent.post(path + '/evidence').set('X-CSRF-Token', other.csrf).attach('image', image, 'test.png').expect(404);
+  await moderator.agent.get(imagePath).expect(200);
+  await reporter.agent.delete(imagePath).set('X-CSRF-Token', reporter.csrf).expect(200);
+});
+
+test('accepted signup domains are normalised; existing accounts on other domains can still log in', async () => {
+  for (const domain of ['GMAIL.COM', 'herconnect.local']) {
+    const agent = request.agent(app);
+    const result = await agent.post('/api/auth/signup').send({ name: 'Domain Check', email: '  domaincheck@' + domain + '  ', password: 'LongTestPassword123!', phone: '01712345678' }).expect(201);
+    assert.equal(result.body.user.email, 'domaincheck@' + domain.toLowerCase());
+    assert.equal(result.body.user.isAdmin, false);
+    if (domain === 'GMAIL.COM') {
+      await User.updateOne({ _id: result.body.user._id }, { $set: { email: 'legacy@example.test' } });
+      await request(app).post('/api/auth/login').send({ email: 'legacy@example.test', password: 'LongTestPassword123!' }).expect(200);
+    }
+  }
+  for (const path of ['/reports?category=invalid', '/hiring/workers?skill=Invalid', '/transport/drivers?vehicleType=Plane']) await reporter.agent.get('/api' + path).expect(400);
 });

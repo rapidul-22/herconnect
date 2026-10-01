@@ -30,7 +30,7 @@ test("actual report routes: creation stores actor, duplicate retries, anonymous 
   t.mock.method(SafetyReport, "create", async (data) => {
     assert.equal(data.reporter, user._id);
     assert.equal(data.status, undefined);
-    assert.equal(data.isDemo, undefined);
+    assert.equal(data.isDemo, false);
     stored = {
       ...data,
       _id: "222222222222222222222222",

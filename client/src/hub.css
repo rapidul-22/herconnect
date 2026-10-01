@@ -33,3 +33,5 @@ main{padding-bottom:85px!important}
 @media(prefers-reduced-motion:reduce){.btn,.sidebar nav a,.product-card,.worker-card,.safety-card,.transport-driver{transition:none;transform:none!important}}
 
 .sos-layout label{display:block;margin-top:12px}
+
+.evidence-upload fieldset{border:0;padding:0;margin:0;min-width:0}.evidence-upload input[type=file]{max-width:100%;min-width:0}.evidence-upload figcaption{overflow-wrap:anywhere;margin:8px 0}.evidence-upload img{width:100%;object-fit:contain}

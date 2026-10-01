@@ -16,7 +16,7 @@ test('one member session owns shop, worker, safety and driver profiles without s
   await mongoose.connect(repl.getUri('shared_account_tests'));
   await Promise.all([initModels(),initHiringModels(),initSafetyModels(),initTransportModels()]);
   const agent=request.agent(app);
-  const signup=await agent.post('/api/auth/signup').send({name:'One Member',email:'one@test.example',phone:'01712345678',password:'LongTestPassword123!'}).expect(201);
+  const signup=await agent.post('/api/auth/signup').send({name:'One Member',email:'one@herconnect.demo',phone:'01712345678',password:'LongTestPassword123!'}).expect(201);
   const user=signup.body.user, csrf=signup.body.csrfToken;
   const write=(method,path,body)=>agent[method]('/api'+path).set('X-CSRF-Token',csrf).send(body);
   await write('post','/seller/apply',{name:'One member shop',city:'Dhaka',story:'A fictional shop application to verify shared account access.'}).expect(201);

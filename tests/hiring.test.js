@@ -71,8 +71,8 @@ test("hiring validates inputs and blocks private endpoints without a session", a
       .get("/api/hiring" + path)
       .expect(401);
   await request(app).post("/api/hiring/bookings").send({}).expect(401);
-  await request(app).get("/api/hiring/workers?skill=Invalid").expect(400);
-  await request(app).get("/api/hiring/workers/not-an-id").expect(400);
+  await request(app).get("/api/hiring/workers?skill=Invalid").expect(401);
+  await request(app).get("/api/hiring/workers/not-an-id").expect(401);
   assert.equal(profileInput.safeParse({}).success, false);
   assert.equal(
     bookingInput.safeParse({ start: "2026-09-15T10:15" }).success,
