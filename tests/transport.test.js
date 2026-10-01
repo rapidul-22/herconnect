@@ -118,8 +118,8 @@ test("transport endpoint guards and actual estimate route reject spoofed fare an
       .expect(401);
   await request(app)
     .get("/api/transport/drivers?vehicleType=Plane")
-    .expect(400);
-  await request(app).get("/api/transport/drivers/nope").expect(400);
+    .expect(401);
+  await request(app).get("/api/transport/drivers/nope").expect(401);
   const isolated = express();
   isolated.use(express.json(), (req, res, next) => {
     req.user = { _id: "member" };

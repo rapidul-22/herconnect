@@ -1,3 +1,4 @@
+import { EvidencePanel } from "./evidence-panel.jsx";
 import { AddressSearch } from "./address-search.jsx";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
@@ -1072,6 +1073,25 @@ function RideReview({ r }) {
     </form>
   );
 }
+function RideEvidence({ ride }) {
+  const [page, setPage] = useState(1);
+  const q = useQuery({ queryKey: ['safety', 'ride-evidence', ride._id, page],
+    queryFn: () => api('/reports/mine?' + new URLSearchParams({ ride: ride._id, page })) });
+  return <section className="safety-panel">
+    <h2>Report an incident & add photos</h2>
+    <p>Attach incident, person or vehicle photos to your own report about this journey. Photos and the journey reference stay private to you and moderators. The report description and approximate area can appear in the member feed.</p>
+    <Link className="btn primary" to={'/safety/new?ride=' + ride._id}>Create journey report</Link>
+    <QueryState query={q}>{q.data && <>
+      {!q.data.total && <p>No reports from you for this journey.</p>}
+      {q.data.reports.map(report => <article key={report._id}>
+        <h3>{report.category} · {at(report.occurredAt)}</h3>
+        <Link to={'/safety/reports/' + report._id}>View report and updates</Link>
+        <EvidencePanel report={report} onDone={() => q.refetch()} />
+      </article>)}
+      <Pager data={q.data} page={page} setPage={setPage} />
+    </>}</QueryState>
+  </section>;
+}
 export function TransportRideDetail() {
   const { id } = useParams(),
     { user } = useApp(),
@@ -1188,6 +1208,7 @@ export function TransportRideDetail() {
                 </ol>
               </div>
               <aside>
+                <RideEvidence ride={r} />
                 {activeRideStatuses.includes(r.status) && (
                   <RideActions key={r.status} r={r} driver={driver} />
                 )}{" "}

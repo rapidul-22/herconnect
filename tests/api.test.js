@@ -39,7 +39,7 @@ async function signup(name) {
     .post("/api/auth/signup")
     .send({
       name,
-      email: name.toLowerCase() + "@example.test",
+      email: name.toLowerCase() + "@herconnect.demo",
       password: "LongTestPassword123!",
       phone: "01712345678",
       isAdmin: true,
@@ -81,12 +81,12 @@ test("full marketplace acceptance and security workflow", async (t) => {
       await request(app).get("/api/orders").expect(401);
       await request(app)
         .post("/api/auth/login")
-        .send({ email: "buyer@example.test", password: "WrongPassword!" })
+        .send({ email: "buyer@herconnect.demo", password: "WrongPassword!" })
         .expect(401);
       await request(app)
         .post("/api/auth/login")
         .set("Origin", "https://evil.example")
-        .send({ email: "buyer@example.test", password: "LongTestPassword123!" })
+        .send({ email: "buyer@herconnect.demo", password: "LongTestPassword123!" })
         .expect(403);
     },
   );
@@ -102,10 +102,10 @@ test("full marketplace acceptance and security workflow", async (t) => {
         201,
       );
       productId = p.body._id;
-      await request(app)
+      await buyer.agent
         .get("/api/products/" + productId)
         .expect(404);
-      assert.equal((await request(app).get("/api/products")).body.total, 0);
+      assert.equal((await buyer.agent.get("/api/products")).body.total, 0);
       await write(buyer, "patch", "/admin/sellers/" + shop.user._id, {
         status: "approved",
         reason: "test",
@@ -114,7 +114,7 @@ test("full marketplace acceptance and security workflow", async (t) => {
         status: "approved",
         reason: "Application reviewed for testing.",
       }).expect(200);
-      await request(app)
+      await buyer.agent
         .get("/api/products/" + productId)
         .expect(200);
     },
@@ -259,10 +259,10 @@ test("full marketplace acceptance and security workflow", async (t) => {
         status: "suspended",
         reason: "Review needed.",
       }).expect(200);
-      await request(app)
+      await buyer.agent
         .get("/api/products/" + productId)
         .expect(404);
-      assert.equal((await request(app).get("/api/products")).body.total, 0);
+      assert.equal((await buyer.agent.get("/api/products")).body.total, 0);
       await write(buyer, "post", "/orders", {
         items: [{ productId, quantity: 1 }],
         shipping,

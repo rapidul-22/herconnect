@@ -4,6 +4,7 @@ import sharp from 'sharp';
 import { z } from "zod";
 import { rateLimit } from "express-rate-limit";
 import { requireAuth, admin, fail } from "./auth.js";
+import { TransportRide } from "./transport-models.js";
 import { SafetyReport, HelpResource } from "./safety-models.js";
 import {
   reportCategories,
@@ -29,6 +30,7 @@ export const reportInput = z.object({
       "Incident time cannot be in the future.",
     ),
   isAnonymous: z.boolean().default(true),
+  transportRide: id.optional(),
   requestKey: z.uuid(),
 });
 export const resourceInput = z
@@ -91,14 +93,18 @@ export function reportView(r, privateView = false) {
       hidden: r.hidden,
       history: r.history,
       personDetails: r.personDetails || '', witnessNotes: r.witnessNotes || '',
-      evidence: (r.evidence || []).map(e => ({ _id: e._id, uploadedAt: e.uploadedAt })),
+      transportRide: r.transportRide,
+      evidence: (r.evidence || []).map(e => ({ _id: e._id, uploadedAt: e.uploadedAt, kind: e.kind || 'Incident', caption: e.caption || '' })),
     });
   return base;
 }
 async function list(req, res, mode) {
   const q = pageQuery.parse(req.query),
     filter = {};
-  if (mode === "mine") filter.reporter = req.user._id;
+  if (mode === "mine") {
+    filter.reporter = req.user._id;
+    if (req.query.ride) filter.transportRide = id.parse(req.query.ride);
+  }
   else filter.isDemo = q.demo === "true";
   if (mode === "public") filter.hidden = false;
   if (q.category) filter.category = q.category;
@@ -140,10 +146,17 @@ safety.post("/reports", requireAuth, submitLimit, async (req, res) => {
     key = { reporter: req.user._id, requestKey: data.requestKey };
   let row = await SafetyReport.findOne(key).select("-evidence.data").populate(populate).lean();
   if (row) return res.json(reportView(row, true));
+  let ride;
+  if (data.transportRide) {
+    ride = await TransportRide.findOne({ _id: data.transportRide,
+      $or: [{ passenger: req.user._id }, { driver: req.user._id }] }).select('_id isDemo');
+    if (!ride) fail(404, 'Journey not found. Only its passenger or driver can attach a report.');
+  }
   try {
     const created = await SafetyReport.create({
       ...data,
       ...key,
+      isDemo: !!ride?.isDemo,
       history: [
         {
           status: "pending",
@@ -311,11 +324,15 @@ safety.post('/reports/:id/evidence', requireAuth, submitLimit, async (req, res, 
   next();
 }, evidenceUpload.single('image'), async (req, res) => {
   if (!req.file || !['image/jpeg','image/png','image/webp'].includes(req.file.mimetype)) fail(400, 'Choose a JPEG, PNG or WebP image under 5 MB.');
+  const details = z.object({
+    kind: z.enum(['Incident', 'Person', 'Vehicle']).default('Incident'),
+    caption: z.string().trim().max(200).default(''),
+  }).parse(req.body);
   let data;
   try { data = await sharp(req.file.buffer, { limitInputPixels: 20000000 }).rotate().resize(1400,1400,{fit:'inside',withoutEnlargement:true}).jpeg({quality:80}).toBuffer(); }
   catch { fail(400, 'The image could not be decoded. Choose another photo.'); }
   const result = await SafetyReport.updateOne({ _id: req.params.id, reporter: req.user._id, 'evidence.2': { $exists: false } },
-    { $push: { evidence: { data, mime: 'image/jpeg', uploadedAt: new Date() } } });
+    { $push: { evidence: { ...details, data, mime: 'image/jpeg', uploadedAt: new Date() } } });
   if (!result.modifiedCount) fail(409, 'This report already has three evidence photos.');
   res.status(201).json({ok:true});
 });

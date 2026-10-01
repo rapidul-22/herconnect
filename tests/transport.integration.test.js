@@ -20,7 +20,7 @@ async function account(name) {
       .post("/api/auth/signup")
       .send({
         name,
-        email: name + "@test.example",
+        email: name + "@herconnect.demo",
         phone: "01712345678",
         password: "LongTestPassword123!",
       })
@@ -89,7 +89,7 @@ test("driver approval, concurrent matching, cross-role lock, private tracking, p
     reason: "Application checked for the test.",
     expectedVersion: 1,
   }).expect(200);
-  const pub = (await request(app).get("/api/transport/drivers/" + profile._id))
+  const pub = (await p1.agent.get("/api/transport/drivers/" + profile._id))
     .body;
   assert.equal(pub.licenseNumber, undefined);
   assert.equal(pub.currentLocation, undefined);
@@ -201,7 +201,7 @@ test("driver approval, concurrent matching, cross-role lock, private tracking, p
     rating: 4,
   }).expect(409);
   assert.equal(
-    (await request(app).get("/api/transport/drivers/" + profile._id)).body
+    (await p1.agent.get("/api/transport/drivers/" + profile._id)).body
       .rating,
     5,
   );
@@ -253,7 +253,7 @@ test("driver approval, concurrent matching, cross-role lock, private tracking, p
     reason: "Driver is no longer available.",
   }).expect(200);
   assert.equal((await Profile.findById(profile._id)).online, false);
-  await request(app)
+  await p1.agent
     .get("/api/transport/drivers/" + profile._id)
     .expect(404);
 });

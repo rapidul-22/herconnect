@@ -1,3 +1,4 @@
+import { allowedSignupEmail, signupEmailMessage } from "../../shared/signup.js";
 import { useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -21,7 +22,7 @@ import {
   formData,
 } from "./shared.jsx";
 export function AuthPage({ mode }) {
-  const { user } = useApp(),
+  const { user, notify } = useApp(),
     navigate = useNavigate(),
     [params] = useSearchParams(),
     [show, setShow] = useState(false),
@@ -81,6 +82,10 @@ export function AuthPage({ mode }) {
     e.preventDefault();
     const data = formData(e);
     if (mode === "reset") data.token = params.get("token") || "";
+    if (mode === 'signup' && !allowedSignupEmail(data.email)) {
+      notify(signupEmailMessage, 'error');
+      return;
+    }
     action.mutate(data);
   }
   return (
@@ -155,7 +160,8 @@ export function AuthPage({ mode }) {
                   type="email"
                   autoComplete="email"
                   required
-                  placeholder="you@example.com"
+                  placeholder={mode === 'signup' ? 'you@gmail.com' : 'Your email address'}
+                  hint={mode === 'signup' ? 'Allowed: gmail.com, herconnect.local, herconnect.demo. Local/demo addresses are for classroom use, not verified inboxes.' : undefined}
                 />
               )}
               {mode === "signup" && (
@@ -244,7 +250,7 @@ export function AuthPage({ mode }) {
   );
 }
 export function Profile() {
-  const { user } = useApp(),
+  const { user, notify } = useApp(),
     navigate = useNavigate();
   const update = useAction(
     (data) => api("/auth/profile", { method: "PATCH", body: data }),
@@ -386,11 +392,11 @@ export function InfoPage({ type }) {
       items: [
         [
           "Information we store",
-          "Your name, email, password hash, mobile number, delivery address, saved products, shop details, orders and reviews. Hiring stores profiles, schedules, bookings and complaints. Safety reports store your account reference, description, incident time, location and moderation history. Transport stores driver applications, private licence numbers, ride locations/status, location timestamps, panic alerts and your optional emergency contact. Optional city, occupation, bio, blood group and emergency contact are stored in your account. Private report details and up to three evidence photos are stored for reporter/moderator access. Photo metadata is stripped. SOS location snapshots are prepared in your browser and shared only through actions you choose. Session tokens are stored hashed.",
+          "Your name, email, password hash, mobile number, delivery address, saved products, shop details, orders and reviews. Hiring stores profiles, schedules, bookings and complaints. Safety reports store your account reference, description, incident time, location and moderation history. Transport stores driver applications, private licence numbers, ride locations/status, location timestamps, panic alerts and your optional emergency contact. Optional city, occupation, bio, blood group and emergency contact are stored in your account. Private report details, optional ride references and up to three labelled incident, person or vehicle photos are stored for reporter/moderator access. Other ride participants cannot access your private evidence. Photo metadata is stripped. SOS location snapshots are prepared in your browser and shared only through actions you choose. Session tokens are stored hashed.",
         ],
         [
           "Who can see what?",
-          "Approved shop and worker profiles, products, reviews and visible safety reports are public. Safety descriptions and area labels are public; public coordinates are approximate. Hiding your name hides account identity from public report responses, not from moderators or the database. Do not put identifying details in public text. Exact incident coordinates and report review notes are available only to the reporter and moderators. Delivery and booking contact details have separate participant access controls. Transport ride details are private to its participants; driver location is shown during accepted/ongoing rides. Moderators can inspect driver applications and panic alerts. Your saved emergency contact is shown only to you.",
+          "Approved shop and worker profiles, products, reviews and visible safety reports are available to signed-in members. Safety descriptions and area labels are public; public coordinates are approximate. Hiding your name hides account identity from public report responses, not from moderators or the database. Do not put identifying details in public text. Exact incident coordinates and report review notes are available only to the reporter and moderators. Delivery and booking contact details have separate participant access controls. Transport ride details are private to its participants; driver location is shown during accepted/ongoing rides. Moderators can inspect driver applications and panic alerts. Your saved emergency contact is shown only to you.",
         ],
         [
           "Images and sample content",

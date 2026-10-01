@@ -82,7 +82,7 @@ function Guard({ admin = false }) {
     return (
       <Navigate
         replace
-        to={"/login?next=" + encodeURIComponent(loc.pathname)}
+        to={"/login?next=" + encodeURIComponent(loc.pathname + loc.search)}
       />
     );
   if (admin && !user.isAdmin) return <Navigate replace to="/dashboard" />;
@@ -134,14 +134,14 @@ function Layout() {
         </button>
         <p className="nav-caption">YOUR EVERYDAY SPACE</p>
         <nav>
-          {links.map(([path, Icon, label]) => (
+          {(user ? links : links.slice(0, 1)).map(([path, Icon, label]) => (
             <NavLink end={path === "/marketplace"} key={path} to={path}>
               <Icon size={19} />
               {label}
             </NavLink>
           ))}
         </nav>
-        <div className="sidebar-note">
+        {user && <div className="sidebar-note">
           <Flower2 size={25} />
           <h3>
             Small businesses.
@@ -154,6 +154,7 @@ function Layout() {
             <ArrowUpRight size={16} />
           </Link>
         </div>
+        }
         <div className="sidebar-bottom">
           {user ? (
             <>
@@ -196,7 +197,7 @@ function Layout() {
           </span>
           <div className="top-actions">
             <span className="location-tag">Made for Bangladesh</span>
-            {!user?.isAdmin && (
+            {user && !user.isAdmin && (
               <Link
                 className="bag-button"
                 to="/cart"
@@ -223,9 +224,10 @@ function Layout() {
               </button>
             )}
             {!user && (
-              <Link to="/signup" className="btn small primary">
-                Join us
-              </Link>
+              <>
+                <Link to="/login" className="btn small">Sign in</Link>
+                <Link to="/signup" className="btn small primary">Join us</Link>
+              </>
             )}
           </div>
         </header>
@@ -306,6 +308,10 @@ export default function App() {
           />
           <Route path="sos" element={<SOS />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="help" element={<InfoPage type="help" />} />
+          <Route path="privacy" element={<InfoPage type="privacy" />} />
+          <Route path="terms" element={<InfoPage type="terms" />} />
+          <Route element={<Guard />}>
           <Route path="marketplace" element={<Marketplace />} />
           <Route path="transport" element={<TransportHome />} />
           <Route path="transport/drivers/:id" element={<TransportDriverDetail />} />
@@ -317,10 +323,7 @@ export default function App() {
           <Route path="hiring/workers/:id" element={<WorkerDetail />} />
           <Route path="marketplace/:id" element={<ProductDetail />} />
           <Route path="shops/:id" element={<Shop />} />
-          <Route path="help" element={<InfoPage type="help" />} />
-          <Route path="privacy" element={<InfoPage type="privacy" />} />
-          <Route path="terms" element={<InfoPage type="terms" />} />
-          <Route element={<Guard />}>
+
             <Route path="safety/new" element={<SafetyNew />} />
             <Route path="safety/mine" element={<SafetyMine />} />
             <Route path="transport/drive" element={<TransportDrive />} />

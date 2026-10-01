@@ -1,3 +1,4 @@
+import { allowedSignupEmail, signupEmailMessage } from "../shared/signup.js";
 import { Router } from "express";
 import { randomBytes, createHash } from "node:crypto";
 import bcrypt from "bcryptjs";
@@ -117,7 +118,7 @@ auth.get("/me", (req, res) =>
 );
 auth.post("/signup", limiter, async (req, res) => {
   const data = z
-    .object({ name: z.string().trim().min(2).max(80), email, password, phone })
+    .object({ name: z.string().trim().min(2).max(80), email: z.string().trim().pipe(email).refine(allowedSignupEmail, signupEmailMessage), password, phone })
     .parse(req.body);
   if (await User.exists({ email: data.email }))
     fail(

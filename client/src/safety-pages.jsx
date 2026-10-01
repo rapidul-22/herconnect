@@ -1,5 +1,6 @@
+import { EvidencePanel } from "./evidence-panel.jsx";
 import { useState, lazy, Suspense } from "react";
-import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
+import { Link, NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   ShieldCheck,
@@ -300,6 +301,9 @@ function LocateButton({ onLocation }) {
 }
 export function SafetyNew() {
   const navigate = useNavigate(),
+    [params] = useSearchParams(),
+    rideId = params.get('ride'),
+    [created, setCreated] = useState(null),
     [point, setPoint] = useState({ lat: 23.8103, lng: 90.4125 }),
     [picked, setPicked] = useState(false),
     [anonymous, setAnonymous] = useState(true),
@@ -310,14 +314,22 @@ export function SafetyNew() {
   };
   const save = useAction(
     (body) => api("/reports", { method: "POST", body }),
-    (r) => navigate("/safety/reports/" + r._id),
-    "Report submitted.",
+    (r) => setCreated(r),
+    "Report submitted. You can now add private photos.",
   );
+  if (created) return <>
+    <PageTitle title="Report saved. Add your photos." description="Your report is already saved. Photos are optional and upload one at a time. A failed upload does not delete your report; retry here or from My reports." />
+    <div className="safety-panel">
+      <EvidencePanel report={created} onDone={async () => setCreated(await api('/reports/' + created._id))} />
+      <Link className="btn primary" to={'/safety/reports/' + created._id}>Done — view report</Link>
+      {rideId && <Link className="btn" to={'/transport/rides/' + rideId}>Back to journey</Link>}
+    </div>
+  </>;
   return (
     <>
       <SafetyNav />
       <PageTitle
-        eyebrow="SHARE AT YOUR OWN PACE"
+        eyebrow={rideId ? "TRANSPORT INCIDENT" : "SHARE AT YOUR OWN PACE"}
         title="Tell us what happened"
         description="Your report can help others make informed choices."
       />
@@ -335,6 +347,7 @@ export function SafetyNew() {
             occurredAt: new Date(d.occurredAt + ":00+06:00").toISOString(),
             isAnonymous: anonymous,
             requestKey: key,
+            ...(rideId ? { transportRide: rideId } : {}),
           });
         }}
       >
@@ -427,7 +440,7 @@ export function SafetyNew() {
         </div>
         <div className="safety-panel">
           <h2>3. Private supporting details</h2>
-          <p>Only you and moderators can see these details. Describe what you observed; a report is an allegation, not a finding of guilt. You can attach up to three photos after submitting.</p>
+          <p>Only you and moderators can see these details. Describe what you observed; a report is an allegation, not a finding of guilt. The next step lets you attach incident, person or vehicle photos privately (up to three).</p>
           <Field label="Person involved: name if known, appearance, clothing, vehicle, relationship" name="personDetails" as="textarea" maxLength={1500} rows={4} />
           <Field label="Witnesses and additional context (private)" name="witnessNotes" as="textarea" maxLength={1000} rows={3} />
           <h2>4. Your privacy</h2>
@@ -450,7 +463,7 @@ export function SafetyNew() {
             <input type="checkbox" required /> I understand this is a public
             community report, not an emergency request.
           </label>
-          <Submit pending={save.isPending}>Submit report</Submit>
+          <Submit pending={save.isPending}>Save report & add photos</Submit>
         </div>
       </form>
     </>
@@ -589,6 +602,7 @@ export function SafetyDetail() {
                 {q.data.history && (
                   <div className="safety-panel">
                     <h2>Private supporting details</h2>
+                    {q.data.transportRide && <p>Linked journey: {String(q.data.transportRide).slice(-8)} (private reference)</p>}
                     <p className="safety-prose">{q.data.personDetails || 'No person details provided.'}</p>
                     <p className="safety-prose">{q.data.witnessNotes}</p>
                     <EvidencePanel report={q.data} onDone={() => q.refetch()} canEdit={String(q.data.reporter?._id || q.data.reporter) === String(user?._id)} />
@@ -1036,22 +1050,4 @@ export function SafetyAdmin() {
       </QueryState>
     </>
   );
-}
-
-function EvidencePanel({report,onDone,canEdit}) {
-  const [error,setError]=useState(''), [busy,setBusy]=useState(false);
-  async function upload(e) {
-    e.preventDefault(); setBusy(true); setError('');
-    const form=e.currentTarget;
-    try { await api('/reports/'+report._id+'/evidence',{method:'POST',body:new FormData(form)}); form.reset(); await onDone(); }
-    catch(e){setError(e.message);} finally{setBusy(false);}
-  }
-  return <section><h3>Private photo evidence</h3><p>Visible only to you and moderators. Image metadata is removed. Do not upload intimate images or unrelated personal documents.</p>
-    <div className="evidence-grid">{(report.evidence || []).map(p=><figure key={p._id}>
-      <img src={'/api/reports/'+report._id+'/evidence/'+p._id} alt="Private supporting evidence" />
-      {canEdit && <button className="btn" type="button" onClick={async()=>{try{await api('/reports/'+report._id+'/evidence/'+p._id,{method:'DELETE'});await onDone();}catch(e){setError(e.message);}}}>Remove photo</button>}
-    </figure>)}</div>
-    {canEdit && (report.evidence || []).length<3 && <form onSubmit={upload}><label>Attach evidence (JPEG, PNG, WebP; max 5 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp" required /></label><button className="btn primary" disabled={busy}>{busy?'Uploading…':'Upload private photo'}</button></form>}
-    {error && <p role="alert">{error}</p>}
-  </section>;
 }
