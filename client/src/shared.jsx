@@ -36,7 +36,7 @@ export async function api(path, options = {}) {
     data = await response.json();
   } catch {
     throw new Error(
-      "The server is unavailable. Check that the API is running.",
+      "The service is temporarily unavailable. Please try again.",
     );
   }
   if (!response.ok) throw new Error(data.error || "Request failed.");
@@ -100,7 +100,7 @@ export function QueryState({ query, children }) {
     return (
       <div className="loading" role="status">
         <LoaderCircle className="spin" />
-        Loading your space…
+        Loading…
       </div>
     );
   if (query.isError)

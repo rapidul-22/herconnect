@@ -3,29 +3,29 @@ import { ShoppingBag, HandHeart, ShieldCheck, CarFront, ArrowUpRight, Flower2, S
 import { useApp } from './shared.jsx';
 import './dashboard.css';
 const modules = [
-  { name: 'Marketplace', tag: 'DISCOVER & CREATE', text: 'Find something you love. Support a small business. Build a shop of your own.', path: '/marketplace', icon: ShoppingBag, tone: 'rose', actions: [['My orders', '/orders'], ['My shop', '/seller']] },
-  { name: 'Services & talent', tag: 'A LITTLE HELP, CLOSE BY', text: 'Discover creative, technical and everyday services, or offer your own expertise.', path: '/hiring', icon: HandHeart, tone: 'peach', actions: [['My bookings', '/hiring/bookings'], ['My service profile', '/hiring/mine']] },
-  { name: 'Safety & support', tag: 'A COMMUNITY THAT CARES', text: 'Share a concern, explore area reports and find support when you need it.', path: '/safety', icon: ShieldCheck, tone: 'sage', actions: [['My reports', '/safety/mine'], ['Find support', '/safety/resources']] },
-  { name: 'Safe transport', tag: 'YOUR NEXT STOP', text: 'Plan your route, request a ride or apply to drive. Keep your journey in view.', path: '/transport', icon: CarFront, tone: 'lavender', actions: [['My rides', '/transport/rides'], ['My driver profile', '/transport/drive']] },
+  { name: 'Marketplace', tag: 'SHOP & SELL', text: 'Browse products from women-led shops, track orders or start selling.', path: '/marketplace', icon: ShoppingBag, tone: 'rose', actions: [['My orders', '/orders'], ['My shop', '/seller']] },
+  { name: 'Services & talent', tag: 'BOOK OR OFFER A SERVICE', text: 'Discover creative, technical and everyday services, or offer your own expertise.', path: '/hiring', icon: HandHeart, tone: 'peach', actions: [['My bookings', '/hiring/bookings'], ['My service profile', '/hiring/mine']] },
+  { name: 'Safety & support', tag: 'REPORTS & RESOURCES', text: 'Share a concern, explore area reports and find support when you need it.', path: '/safety', icon: ShieldCheck, tone: 'sage', actions: [['My reports', '/safety/mine'], ['Find support', '/safety/resources']] },
+  { name: 'Safe transport', tag: 'PLAN A RIDE', text: 'Plan your route, request a ride or apply to drive. Keep your journey in view.', path: '/transport', icon: CarFront, tone: 'lavender', actions: [['My rides', '/transport/rides'], ['My driver profile', '/transport/drive']] },
 ];
 export function Dashboard() {
   const { user } = useApp();
   return <div className="central-home">
     <section className="central-hero">
       <div className="central-intro">
-        <span className="eyebrow"><Sparkles size={15} /> YOUR EVERYDAY, CONNECTED</span>
+        <span className="eyebrow"><Sparkles size={15} /> HERCONNECT+ FOR WOMEN</span>
         <p className="central-greeting">{user ? `Welcome back, ${user.name.split(' ')[0]}.` : 'Welcome to HerConnect+'}</p>
-        <h1>One space.<br /><em>So many possibilities.</em></h1>
-        <p>Shop, connect, find support or get moving.<br />Where would you like to start today?</p>
-        <a href="#choose-module" className="btn primary">Choose your space <ArrowUpRight size={18} /></a>
+        <h1>Your plans.<br /><em>One connected place.</em></h1>
+        <p>Find products, book a service, check community reports or plan a ride.<br />Choose where to begin.</p>
+        <a href="#choose-module" className="btn primary">Explore the modules <ArrowUpRight size={18} /></a>
       </div>
       <div className="central-art" aria-hidden="true">
         <div className="central-ring" /><span className="central-flower"><Flower2 size={74} /></span>
         {modules.map(({ icon: Icon, name }, i) => <span key={name} className={'central-orbit orbit-' + i}><Icon size={26} /></span>)}
-        <span className="central-art-note">Built around her.</span>
+        <span className="central-art-note">Shopping · Services · Support · Travel</span>
       </div>
     </section>
-    <div className="central-heading" id="choose-module"><div><span className="eyebrow">FOUR WAYS TO CONNECT</span><h2>Your day. Your choice.</h2></div><p>{user ? "Explore any module with the same account." : "Sign in or join to open a module. One account gives access to all four."}</p></div>
+    <div className="central-heading" id="choose-module"><div><span className="eyebrow">FOUR WAYS TO CONNECT</span><h2>What would you like to do?</h2></div><p>{user ? "Explore any module with the same account." : "Sign in or join to open a module. One account gives access to all four."}</p></div>
     <section className="central-modules" aria-label="Choose a module">
       {modules.map(({ name, tag, text, path, icon: Icon, tone, actions }, i) => <article key={name} className={'central-card ' + tone}>
         <Link className="central-card-main" to={path} aria-label={'Open ' + name}>
@@ -37,9 +37,9 @@ export function Dashboard() {
       </article>)}
     </section>
     <section className="central-account">
-      <span className="central-icon"><Flower2 size={30} /></span><div><h2>One account, every part of your day.</h2>
+      <span className="central-icon"><Flower2 size={30} /></span><div><h2>Manage all four modules with one account.</h2>
       <p>Buy and sell, hire and offer services, report concerns, ride and apply to drive. Your shop, worker and driver profiles stay connected to your existing account. Service profiles need approval before going public.</p></div>
-      <Link className="btn" to={user ? '/profile' : '/signup'}>{user ? 'My account' : 'Create one account'}<ArrowUpRight size={17}/></Link>
+      <Link className="btn" to={user ? '/profile' : '/signup'}>{user ? 'My profile' : 'Create an account'}<ArrowUpRight size={17}/></Link>
     </section>
     {user?.isAdmin && <section className="central-admin"><h2>Moderation workspace</h2><p>Moderation permissions remain separate from member activities.</p><div>{[['Shops','/admin'],['Workers','/admin/hiring'],['Safety','/admin/safety'],['Transport','/admin/transport']].map(([label,path])=><Link key={path} className="btn" to={path}>{label}</Link>)}</div></section>}
   </div>;

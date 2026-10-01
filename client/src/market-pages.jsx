@@ -67,25 +67,25 @@ export function Marketplace() {
             Made by her.
             <br className="mobile-only" /> <em>Loved by you.</em>
           </h1>
-          <p>Thoughtful finds. Independent makers. Everyday joy.</p>
+          <p>Shop clothing, food, homeware and handmade products from women-led businesses.</p>
         </div>
         <Link className="text-link" to="/seller">
-          Meet your next chapter
+          Open your shop
           <ArrowUpRightIcon />
         </Link>
       </div>
       <section className="market-banner">
         <div>
-          <span className="eyebrow">THE EVERYDAY EDIT</span>
+          <span className="eyebrow">HANDMADE COLLECTION</span>
           <h2>
-            Little things.
+            Made with skill.
             <br />
-            Lovely beginnings.
+            Chosen by you.
           </h2>
           <p>
-            Discover pieces that make the everyday
+            Browse handmade homeware and gifts
             <br />
-            feel a little more personal.
+            from independent sellers.
           </p>
           <button
             className="btn primary"
@@ -112,9 +112,9 @@ export function Marketplace() {
             alt="A candle in a glass jar"
           />
           <span className="round-note">
-            small finds
+            independent
             <br />
-            <em>big heart</em>
+            <em>makers</em>
             <Heart size={18} />
           </span>
         </div>
@@ -198,7 +198,7 @@ export function Marketplace() {
         <div className="catalog-count">
           <span>
             {query.data
-              ? `${query.data.total} thoughtful finds`
+              ? `${query.data.total} products`
               : "Finding your favourites…"}
           </span>
           {params.size > 0 && (
@@ -242,8 +242,8 @@ export function Marketplace() {
       <section className="seller-invite">
         <div>
           <Flower2 size={30} />
-          <h2>Your passion deserves a little space.</h2>
-          <p>Bring your products, your story, and your ideas to HerConnect+.</p>
+          <h2>Ready to sell your products?</h2>
+          <p>Apply for a shop, add your products and manage orders from one place.</p>
         </div>
         <Link className="btn" to="/seller">
           Open your shop
@@ -381,7 +381,7 @@ export function ProductDetail() {
                 <p>{p.materials}</p>
               </details>
               <details>
-                <summary>A little care goes a long way</summary>
+                <summary>Care instructions & ingredients</summary>
                 <p>{p.care}</p>
               </details>
               <details>
@@ -440,9 +440,9 @@ export function Wishlist() {
   return (
     <>
       <PageTitle
-        eyebrow="YOUR LITTLE COLLECTION"
-        title="Saved for a little later."
-        description="All the lovely things that caught your eye."
+        eyebrow="YOUR FAVOURITES"
+        title="Saved products"
+        description="Products you saved for later."
       />
       <QueryState query={query}>
         {query.data?.length ? (
@@ -495,9 +495,9 @@ export function Cart() {
   return (
     <>
       <PageTitle
-        eyebrow="A FEW GOOD FINDS"
+        eyebrow="YOUR ORDER"
         title="Your shopping bag."
-        description="A little joy, ready to come home."
+        description="Review your items and check out separately for each shop."
       />
       {cart.length ? (
         <div className="checkout-grid">
@@ -571,7 +571,7 @@ export function Cart() {
             </Link>
           </div>
           <div className="panel summary-card">
-            <h2>The little details</h2>
+            <h2>Order details</h2>
             <div>
               <span>Subtotal</span>
               <strong>{money(subtotal)}</strong>
@@ -591,8 +591,8 @@ export function Cart() {
         </div>
       ) : (
         <Empty
-          title="Your bag has a little room"
-          description="Discover something lovely and add it to your bag."
+          title="Your bag is empty"
+          description="Browse the marketplace and add a product to get started."
         />
       )}
     </>
@@ -771,7 +771,7 @@ export function Orders() {
         title={
           sales
             ? "Every order, a new connection."
-            : "Your lovely little orders."
+            : "My orders"
         }
         description={
           sales
@@ -901,7 +901,7 @@ export function OrderDetail() {
             title={
               o.status === "cancelled"
                 ? "Order cancelled."
-                : "A little closer to yours."
+                : "Track your order"
             }
             description={
               "Placed " + date(o.createdAt) + " · " + o.seller.shop.name

@@ -29,6 +29,7 @@ import {
   X,
   Sparkles,
   BadgeCheck,
+  Phone,
 } from "lucide-react";
 import {
   api,
@@ -89,6 +90,19 @@ function Guard({ admin = false }) {
   return <Outlet />;
 }
 import SOS from './sos.jsx';
+// Outside the page layout so emergency access also works on auth/error screens.
+function EmergencyCall() {
+  const [showHelp, setShowHelp] = useState(false);
+  return <div className="emergency-access">
+    {showHelp && <div className="emergency-note">
+      <button className="icon-button" aria-label="Dismiss calling information" onClick={() => setShowHelp(false)}><X size={16} /></button>
+      <p role="status">If your dialler did not open, call 999 from a phone. HerConnect+ has not placed a call or sent your location.</p>
+    </div>}
+    <a className="sos-float" href="tel:999" aria-label="SOS: call Bangladesh emergency service 999" title="999: police, fire and ambulance. Opens your device’s calling app." onClick={() => setShowHelp(true)}>
+      <Phone size={19} aria-hidden="true" /><span>SOS · Call 999</span>
+    </a>
+  </div>;
+}
 function Layout() {
   const { user, cart } = useApp(),
     [menu, setMenu] = useState(false),
@@ -113,6 +127,7 @@ function Layout() {
     ["/safety", ShieldCheck, "Safety & support"],
     ["/transport", CarFront, "Safe transport"],
     ["/sos", ShieldCheck, "SOS & trusted contacts"],
+    ["/profile", UserRound, "My profile"],
     ...(!user?.isAdmin
       ? [
           ["/wishlist", Heart, "Saved favourites"],
@@ -132,9 +147,10 @@ function Layout() {
         >
           <X />
         </button>
-        <p className="nav-caption">YOUR EVERYDAY SPACE</p>
-        <nav>
-          {(user ? links : links.slice(0, 1)).map(([path, Icon, label]) => (
+        <div className="sidebar-scroll">
+        <p className="nav-caption">{user ? "YOUR ACCOUNT" : "EXPLORE HERCONNECT+"}</p>
+        <nav aria-label="Main navigation">
+          {(user ? links : links.slice(0, 5)).map(([path, Icon, label]) => (
             <NavLink end={path === "/marketplace"} key={path} to={path}>
               <Icon size={19} />
               {label}
@@ -144,17 +160,18 @@ function Layout() {
         {user && <div className="sidebar-note">
           <Flower2 size={25} />
           <h3>
-            Small businesses.
+            Manage your shop.
             <br />
-            Meaningful beginnings.
+            Reach more customers.
           </h3>
-          <p>A little support goes a long way.</p>
+          <p>Keep your products and orders up to date.</p>
           <Link to={user?.isAdmin ? "/admin" : "/seller"}>
             {user?.isAdmin ? "Review applications" : "Start your own shop"}
             <ArrowUpRight size={16} />
           </Link>
         </div>
         }
+        </div>
         <div className="sidebar-bottom">
           {user ? (
             <>
@@ -163,7 +180,7 @@ function Layout() {
                 <span>
                   <strong>{user.name}</strong>
                   <small>
-                    {user.isAdmin ? "Moderator" : "Your personal space"}
+                    {user.isAdmin ? "My profile · Moderator" : "My profile & settings"}
                   </small>
                 </span>
               </NavLink>
@@ -193,7 +210,7 @@ function Layout() {
             <Menu />
           </button>
           <span className="topbar-label">
-            A little more connected. A little more you.
+            Work, shopping and support for women
           </span>
           <div className="top-actions">
             <span className="location-tag">Made for Bangladesh</span>
@@ -233,11 +250,10 @@ function Layout() {
         </header>
         <main id="main">
           <Outlet />
-          <Link className="sos-float" to="/sos" aria-label="Open SOS and emergency contact tools">SOS · Get help</Link>
         </main>
         <footer>
           <span>
-            © {new Date().getFullYear()} HerConnect+ · Built around her.
+            © {new Date().getFullYear()} HerConnect+ · A platform for women
           </span>
           <div>
             <Link to="/help">Help & FAQs</Link>
@@ -266,18 +282,19 @@ export default function App() {
     return (
       <div className="boot">
         <Flower2 className="spin" />
-        <p>Opening your space…</p>
+        <p>Loading HerConnect+…</p>
+        <EmergencyCall />
       </div>
     );
   if (session.isError)
     return (
       <div className="boot">
-        <h1>Let’s get connected.</h1>
-        <p>{session.error.message}</p>
-        <p>Start the API and confirm your MongoDB connection.</p>
+        <h1>Unable to load HerConnect+</h1>
+        <p>Please check your connection and try again.</p>
         <button className="btn primary" onClick={() => session.refetch()}>
           Try again
         </button>
+        <EmergencyCall />
       </div>
     );
   return (
@@ -358,15 +375,16 @@ export default function App() {
             path="*"
             element={
               <div className="empty">
-                <h1>This page wandered off.</h1>
+                <h1>Page not found</h1>
                 <Link className="btn primary" to="/dashboard">
-                  Back to your space
+                  Back to dashboard
                 </Link>
               </div>
             }
           />
         </Route>
       </Routes>
+      <EmergencyCall />
       {toast && (
         <div
           className={"toast " + toast.type}

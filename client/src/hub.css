@@ -35,3 +35,56 @@ main{padding-bottom:85px!important}
 .sos-layout label{display:block;margin-top:12px}
 
 .evidence-upload fieldset{border:0;padding:0;margin:0;min-width:0}.evidence-upload input[type=file]{max-width:100%;min-width:0}.evidence-upload figcaption{overflow-wrap:anywhere;margin:8px 0}.evidence-upload img{width:100%;object-fit:contain}
+
+/* Issues 19–23: scroll navigation independently; keep account access visible. */
+.sidebar { height:100vh; height:100dvh; overflow:hidden; }
+.sidebar > .sidebar-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; margin:18px -6px 14px; padding:0 6px; }
+.sidebar-scroll .nav-caption { margin:14px 12px 14px; color:#715965; font-size:.68rem; letter-spacing:.12em; }
+.sidebar-scroll nav { gap:3px; }
+.sidebar-scroll nav a { padding:12px; min-height:44px; color:#614758; }
+.sidebar-scroll nav a.active { color:#fff; }
+.sidebar-scroll nav a svg { flex-shrink:0; }
+.sidebar-note { margin:22px 0 8px; background:#ffffff8c; }
+.sidebar-bottom { flex-shrink:0; margin-top:0; padding-top:14px; padding-bottom:2px; background:transparent; }
+.sidebar-bottom > .btn { width:100%; font-size:.82rem; padding:12px 8px; }
+.sidebar-bottom > a > span:last-child { min-width:0; }
+.sidebar-bottom a:hover strong { color:var(--berry); }
+.topbar-label { color:#715965; }
+.topbar { box-shadow:0 3px 20px #50314905; }
+
+/* Shared visual details keep the modules consistent. */
+.logo-mark { box-shadow:0 5px 14px #893d6824; border:1px solid #ffffff55; }
+.page-title { border-bottom:1px solid #dfcbd8; }
+.page-title h1 { color:#503149; }
+.panel,.safety-panel,.hiring-panel { box-shadow:0 9px 28px #54344808; }
+.market-banner { border:1px solid #e8d0dd; box-shadow:0 12px 32px #54344809; }
+.central-hero { box-shadow:0 16px 42px #60374f0d,inset 0 0 0 5px #ffffff55; }
+.central-card { box-shadow:0 7px 24px #60374f08; }
+.central-card-main:focus-visible { outline-offset:-5px; }
+.central-card-top .central-icon { box-shadow:0 5px 14px #60374f0a; }
+.central-number { opacity:.55; color:#76506b; }
+.auth-form { border:1px solid #eadce5; border-radius:26px; padding:30px; background:#fffdfbf2; box-shadow:0 16px 48px #5434480a; }
+.auth-story { background:linear-gradient(145deg,#fae8ee,#efe6f4); }
+.form-panel h2 { padding-bottom:14px; border-bottom:1px solid #eee1e9; }
+
+/* Emergency access also works on auth and service-error screens. */
+.emergency-access { position:fixed; right:max(20px,env(safe-area-inset-right)); bottom:calc(18px + env(safe-area-inset-bottom)); z-index:1100; display:flex; flex-direction:column; align-items:flex-end; gap:10px; max-width:calc(100vw - 24px); }
+.emergency-access .sos-float { position:static; display:inline-flex; align-items:center; gap:9px; min-height:48px; padding:12px 19px; border:2px solid #fff; border-radius:99px; background:#a12143; color:#fff; font-size:.9rem; font-weight:700; box-shadow:0 6px 22px #651b3430; }
+.emergency-access .sos-float:hover { background:#841735; }
+.emergency-access .sos-float:focus-visible { outline:3px solid #331326; outline-offset:3px; }
+.emergency-note { width:310px; max-width:100%; padding:16px; background:#fff; border:1px solid #d7b2bf; border-radius:16px; box-shadow:0 8px 30px #35132320; }
+.emergency-note p { margin:0; color:#503149; font-size:.85rem; line-height:1.6; text-align:left; }
+.emergency-note .icon-button { float:right; width:30px; height:30px; margin:-8px -8px 4px 4px; }
+.workspace footer { padding-bottom:100px; }
+.toast { bottom:90px; max-width:calc(100vw - 32px); }
+@media(max-width:760px) {
+  .sidebar { padding-bottom:max(18px,env(safe-area-inset-bottom)); }
+  .emergency-access { right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); }
+  .emergency-access .sos-float { padding:11px 15px; font-size:.85rem; }
+  .auth-form { padding:22px 18px; border-radius:20px; }
+  .auth-form-side { padding-bottom:110px!important; }
+}
+@media(max-height:540px) { .sidebar > .logo { margin-top:0; }.sidebar > .sidebar-scroll { margin-top:8px; margin-bottom:8px; }.sidebar-bottom { padding-top:8px; } }
+@media(max-width:760px) {
+  .app-layout:has(.sidebar.open) ~ .emergency-access { bottom:calc(86px + env(safe-area-inset-bottom)); }
+}
