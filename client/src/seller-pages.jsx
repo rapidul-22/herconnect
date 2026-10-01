@@ -54,11 +54,11 @@ export function Seller() {
     <>
       <PageTitle
         eyebrow="MADE BY YOU"
-        title={status === "none" ? "Your ideas belong here." : user.shop.name}
+        title={status === "none" ? "Open your shop" : user.shop.name}
         description={
           status === "none"
-            ? "Turn your passion into a little shop of your own."
-            : "Your products, your customers, your next chapter."
+            ? "Add your shop details and submit an application to start selling."
+            : "Manage products, stock and customer orders."
         }
       >
         {status !== "none" && (
@@ -70,13 +70,13 @@ export function Seller() {
           <div className="seller-story">
             <Flower2 size={40} />
             <h2>
-              Small beginnings.
+              Introduce your shop.
               <br />
-              Beautiful possibilities.
+              List your products.
             </h2>
             <p>
-              Tell us about your shop. After a moderator reviews your
-              application, your products can find their way to the community.
+              Submit your shop details for review. Once a moderator approves your
+              application, customers can browse your products.
             </p>
             <ul>
               <li>
@@ -360,11 +360,11 @@ function ProductForm({ product }) {
     <>
       <PageTitle
         eyebrow="YOUR SHOP"
-        title={product ? "A little fine-tuning." : "Meet your next bestseller."}
+        title={product ? "Edit product" : "Add a product"}
         description={
           product
             ? "Update the details and keep your inventory current."
-            : "A clear photograph and thoughtful details make all the difference."
+            : "Add clear photos, an accurate description, price and stock quantity."
         }
       />
       <form
@@ -528,7 +528,7 @@ export function Admin() {
     <>
       <PageTitle
         eyebrow="MODERATION"
-        title="A thoughtful place to grow."
+        title="Shop moderation"
         description="Review shop applications, manage listings and keep a record of decisions."
       />
       <div className="category-tabs admin-tabs">

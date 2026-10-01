@@ -78,7 +78,7 @@ function Nav() {
       {user && !user.isAdmin && (
         <>
           <NavLink to="/transport/rides">My rides</NavLink>
-          <NavLink to="/transport/drive">Driver space</NavLink>
+          <NavLink to="/transport/drive">Driver dashboard</NavLink>
           <NavLink to="/transport/contact">Emergency contact</NavLink>
         </>
       )}
@@ -270,7 +270,7 @@ export function TransportHome() {
       <Nav />
       <section className="transport-hero">
         <div>
-          <span className="eyebrow">YOUR NEXT CHAPTER, A LITTLE CLOSER</span>
+          <span className="eyebrow">PLAN YOUR JOURNEY</span>
           <h1>
             Where would you
             <br />
@@ -291,7 +291,7 @@ export function TransportHome() {
         </div>
         <div className="transport-hero-icon" aria-hidden="true">
           <CarFront size={110} />
-          <span>Made for your everyday journeys.</span>
+          <span>Choose a route. Review the fare. Request a ride.</span>
         </div>
       </section>
       <Notice />
@@ -643,7 +643,7 @@ export function TransportDrive() {
     <>
       <Nav />
       <PageTitle
-        title="Your driver space"
+        title="My driver dashboard"
         description="Manage your application, availability and incoming ride."
       />
       <Notice />
@@ -772,7 +772,7 @@ export function TransportContact() {
     <>
       <Nav />
       <PageTitle
-        title="Someone you can turn to"
+        title="My trusted contact"
         description="Save one contact for quick access during a ride."
       />
       <Notice />

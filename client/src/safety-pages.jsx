@@ -163,14 +163,14 @@ export function SafetyFeed() {
       <SafetyNav />
       <section className="safety-hero">
         <div>
-          <span className="eyebrow">YOUR VOICE. OUR COMMUNITY.</span>
+          <span className="eyebrow">COMMUNITY SAFETY & SUPPORT</span>
           <h1>
-            A little more informed.
-            <br />A little more supported.
+            Report a concern.
+            <br />Find support.
           </h1>
           <p>
-            Share a concern, understand your surroundings, and find a place to
-            turn.
+            Read community reports, record an incident, or look up support
+            contacts.
           </p>
           <Link className="btn primary" to="/safety/new">
             Share a report <ArrowRight size={17} />
@@ -178,7 +178,7 @@ export function SafetyFeed() {
         </div>
         <div className="safety-hero-art" aria-hidden="true">
           <ShieldCheck size={82} />
-          <span>Speak. Support. Connect.</span>
+          <span>Reports · Area insights · Support</span>
         </div>
       </section>
       <Notice />
@@ -329,7 +329,7 @@ export function SafetyNew() {
     <>
       <SafetyNav />
       <PageTitle
-        eyebrow={rideId ? "TRANSPORT INCIDENT" : "SHARE AT YOUR OWN PACE"}
+        eyebrow={rideId ? "TRANSPORT INCIDENT" : "REPORT AN INCIDENT"}
         title="Tell us what happened"
         description="Your report can help others make informed choices."
       />
@@ -838,7 +838,7 @@ export function SafetyResources() {
     <>
       <SafetyNav />
       <PageTitle
-        title="A place to turn"
+        title="Support directory"
         description="Find support contacts and nearby facilities."
       >
         {user?.isAdmin && (

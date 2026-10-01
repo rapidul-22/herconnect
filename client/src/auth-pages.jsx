@@ -31,21 +31,21 @@ export function AuthPage({ mode }) {
   const labels = {
     login: [
       "Welcome back.",
-      "Your space, your people, your possibilities.",
+      "Sign in to manage your orders, services, reports and rides.",
       "Sign in",
     ],
     signup: [
-      "A space for you.",
-      "Join a community of women making things happen.",
+      "Create your account.",
+      "Use one account across all four HerConnect+ modules.",
       "Create your account",
     ],
     forgot: [
-      "Let’s get you back in.",
+      "Reset your password.",
       "Enter your email to request a password reset.",
       "Send reset link",
     ],
     reset: [
-      "A fresh start.",
+      "Set a new password.",
       "Choose a new password for your account.",
       "Reset password",
     ],
@@ -95,18 +95,18 @@ export function AuthPage({ mode }) {
         <div>
           <span className="eyebrow">HERCONNECT+</span>
           <h1>
-            Good things
+            Your work.
             <br />
-            begin with
+            Your community.
             <br />
-            <em>connection.</em>
+            <em>Your HerConnect+.</em>
           </h1>
           <p>
-            Find your everyday favourites.
+            Shop from women-led businesses.
             <br />
-            Build something of your own.
+            Offer your skills and find services.
             <br />
-            Feel a little more connected.
+            Access transport and support.
           </p>
         </div>
         <div className="auth-photo">
@@ -115,17 +115,17 @@ export function AuthPage({ mode }) {
             alt="Handmade pottery with a warm natural finish"
           />
           <span>
-            For her ideas.
+            Women-led businesses.
             <br />
-            For her everyday.
+            Everyday essentials.
           </span>
         </div>
-        <small>Made for women. Open to possibilities.</small>
+        <small>Shopping, services, safety and transport for women.</small>
       </section>
       <main id="main" className="auth-form-side">
         <Link to="/dashboard" className="back-link">
           <ArrowLeft size={16} />
-          Back to explore
+          Back to dashboard
         </Link>
         <div className="auth-form">
           <div className="auth-flower">
@@ -239,7 +239,7 @@ export function AuthPage({ mode }) {
           )}
           <div className="auth-trust">
             <ShieldCheck size={16} />
-            Your password is protected. Your space is personal.
+            Keep your password private. Sign out when using a shared device.
           </div>
         </div>
         <span className="auth-copyright">
@@ -266,10 +266,12 @@ export function Profile() {
     <>
       <PageTitle
         eyebrow="YOUR ACCOUNT"
-        title="A little about you."
-        description="Keep your details up to date for a smoother experience."
+        title="My profile"
+        description="Manage your personal details, emergency contact and password."
       />
-      <div className="notice"><div><h2>Your account works everywhere</h2><p>Use this login across all four modules. Apply for service profiles without creating another account.</p><p><Link to="/seller">My shop</Link> · <Link to="/hiring/mine">My worker profile</Link> · <Link to="/transport/drive">My driver profile</Link> · <Link to="/safety/mine">My safety reports</Link></p></div></div>
+      <div className="notice"><div><h2>{user.isAdmin ? 'Your moderator account' : 'One account for all four modules'}</h2>
+        {user.isAdmin ? <p>Manage your personal details here. Use the moderation links in the sidebar to review applications and reports.</p> : <><p>Manage your services and activity without creating another account.</p><p><Link to="/seller">My shop</Link> · <Link to="/hiring/mine">My service profile</Link> · <Link to="/transport/drive">My driver profile</Link> · <Link to="/safety/mine">My safety reports</Link></p></>}
+      </div></div>
       <div className="profile-grid">
         <form
           className="panel form-panel"
@@ -291,7 +293,7 @@ export function Profile() {
             label="Email"
             value={user.email}
             readOnly
-            hint="Your login email cannot be changed in this release."
+            hint="Your sign-in email is read-only."
           />
           <Field
             label="Mobile number"
@@ -358,7 +360,7 @@ export function Profile() {
 export function InfoPage({ type }) {
   const content = {
     help: {
-      title: "A little help, right here.",
+      title: "Help & frequently asked questions",
       items: [
         ["One account, four modules", "A regular member uses one login to buy or sell, hire or offer services, submit safety reports, and ride or apply to drive. Shop, worker and driver applications still require approval. Moderator accounts remain dedicated to administration."],
         [
@@ -388,7 +390,7 @@ export function InfoPage({ type }) {
       ],
     },
     privacy: {
-      title: "Your privacy matters.",
+      title: "Privacy notice",
       items: [
         [
           "Information we store",
@@ -433,7 +435,7 @@ export function InfoPage({ type }) {
         ],
         [
           "Other services",
-          "All four modules are implemented as a classroom prototype. Reports are community submissions, not verified allegations; review status does not imply police action. Hotspots never guarantee safety. New Transport fares use provider road distance and classroom rates. Travel times are not live traffic predictions. CNG uses a car-route approximation and rickshaw uses bicycle routing; local restrictions may differ. Older/demo rides retain their original straight-line estimates. Driver approval is not a background check. Panic alerts are recorded in the app without automatic SMS, calls or police dispatch.",
+          "All four modules are implemented as a classroom prototype. Reports are community submissions, not verified allegations; review status does not imply police action. Hotspots never guarantee safety. New Transport fares use provider road distance and classroom rates. Travel times are not live traffic predictions. CNG uses a car-route approximation; local restrictions may differ. Older/demo rides retain their original straight-line estimates. Driver approval is not a background check. Panic alerts are recorded in the app without automatic SMS, calls or police dispatch.",
         ],
       ],
     },

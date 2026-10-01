@@ -141,11 +141,11 @@ export function HiringDirectory() {
       <HiringNav />
       <section className="hiring-hero">
         <div>
-          <span className="eyebrow">A LITTLE HELP. MORE ROOM FOR LIFE.</span>
+          <span className="eyebrow">SERVICES BY WOMEN</span>
           <h1>
-            Good help starts
+            Find the skills
             <br />
-            with a connection.
+            you need.
           </h1>
           <p>
             Find women in technology, design, business and home services. Request a
@@ -165,9 +165,9 @@ export function HiringDirectory() {
         <div className="hiring-hero-art" aria-hidden="true">
           <HandHeart size={90} />
           <span>
-            A helping hand,
+            Professional skills.
             <br />
-            <em>closer to home.</em>
+            <em>Flexible bookings.</em>
           </span>
         </div>
       </section>
@@ -342,7 +342,7 @@ function WorkerDetailBody({ p }) {
       <div className="checkout-grid">
         <div>
           <section className="panel hiring-section">
-            <h2>A little about my work</h2>
+            <h2>About my services</h2>
             <p>{p.bio}</p>
             <div className="worker-skills">
               {p.skills.map((s) => (
@@ -509,8 +509,8 @@ export function WorkerMine() {
       <HiringNav />
       <PageTitle
         eyebrow="YOUR SKILLS, YOUR SCHEDULE"
-        title="Make room for your next opportunity."
-        description="Create a worker profile. Approval is separate from any shop you own."
+        title="My service profile"
+        description="List your skills, rates and availability. A moderator reviews your profile before it is published."
       />
       <Link className="btn" to="/hiring/bookings?view=worker">
         <BriefcaseBusiness size={18} />
@@ -728,7 +728,7 @@ export function HiringBookings() {
     <>
       <HiringNav />
       <PageTitle
-        eyebrow="PLANS, MADE CLEAR"
+        eyebrow="YOUR BOOKINGS"
         title={
           view === "worker"
             ? "Your incoming bookings."
@@ -1047,7 +1047,7 @@ export function HiringComplaints() {
     <>
       <HiringNav />
       <PageTitle
-        title="Your reported concerns."
+        title="My booking complaints"
         description="Only your own submissions appear here. Moderators review each concern."
       />
       <QueryState query={result}>
@@ -1092,7 +1092,7 @@ export function HiringAdmin() {
       <HiringNav />
       <PageTitle
         eyebrow="WORKER MODERATION"
-        title="Review with care."
+        title="Service moderation"
         description="Worker approval is separate from marketplace approval. Record the reason for every decision."
       />
       <div className="hiring-nav">
@@ -1223,7 +1223,7 @@ export function HiringAdmin() {
           ))
         ) : (
           <Empty
-            title="Nothing waiting here"
+            title="No pending items"
             description="New submissions and decisions will appear here."
             to={null}
           />
